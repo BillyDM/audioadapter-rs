@@ -1,7 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-
 /// The traits for accessing samples in buffers.
 mod traits;
 pub use traits::{Adapter, AdapterMut};
@@ -21,7 +20,6 @@ pub use iterators::AdapterIterators;
 
 #[cfg(feature = "audio")]
 pub mod audio;
-
 
 /// Error returned when the wrapped data structure has the wrong dimensions,
 /// typically that it is too short.
@@ -83,7 +81,6 @@ impl fmt::Display for SizeError {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::{Adapter, AdapterMut};
@@ -94,7 +91,6 @@ mod tests {
         frames: usize,
         channels: usize,
     }
-
 
     impl<T> VecAdapter<T>
     where
@@ -107,7 +103,6 @@ mod tests {
                 channels,
             }
         }
-
     }
 
     impl<'a, T> Adapter<'a, T> for VecAdapter<T>
@@ -132,7 +127,12 @@ mod tests {
     where
         T: Clone + 'a,
     {
-        unsafe fn write_sample_unchecked(&mut self, channel: usize, frame: usize, value: &T) -> bool {
+        unsafe fn write_sample_unchecked(
+            &mut self,
+            channel: usize,
+            frame: usize,
+            value: &T,
+        ) -> bool {
             let index = frame * self.channels + channel;
             *self.buf.get_unchecked_mut(index) = value.clone();
             false

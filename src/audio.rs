@@ -161,6 +161,3 @@ mod tests {
         assert_eq!(buf.get_channel(1).unwrap().get(1).unwrap(), 4);
     }
 }
-
-
-

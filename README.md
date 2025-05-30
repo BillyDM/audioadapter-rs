@@ -106,7 +106,7 @@ The format conversions are performed using the
 [audioadapter-sample](https://crates.io/crates/audioadapter-sample) crate.
 
 ## Compatibility with the [audio](https://crates.io/crates/audio) crate
-In addition to the provided wrappers, the [Adapter], [AdapterMut] traits are implemented for
+The [Adapter] and [AdapterMut] traits are implemented for
 buffers implementing the [audio_core::Buf], [audio_core::BufMut] and [audio_core::ExactSizeBuf]
 traits from the [audio](https://crates.io/crates/audio) crate.
 This is enabled via the `audio` Cargo feature, which is enabled by default.
@@ -123,8 +123,8 @@ buf.read_sample(0,0);
 
 
 ## Supporting new data structures
-The required trait methods are simple, to make is easy to implement them for
-new data structures.
+The required trait methods are simple, in order to make is easy
+to implement them for new data structures.
 The tests of this crate includes a minimal implementation called `VecAdapter`,
 that is based on a normal vector. 
 
@@ -137,9 +137,5 @@ of cloning the data, such as [slice::clone_from_slice()].
 See also the `custom_adapter` example.
 This shows an implementation of [Adapter]
 for a vector of strings.
-
-### Ideas for future improvements
-- index iterator (providing channel, frame)
-- supporting reuse of wrapping adapters by replacing inner data
 
 ## License: MIT

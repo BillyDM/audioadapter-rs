@@ -5,14 +5,14 @@ The `audioadapter` library simplifies working with audio data buffers.
 Audio data can vary in layout and numerical representation.
 This crate bridges these differences, handling both layout and data types effectively.
 
-It does not introduce new data structures for storing audio data.
-Instead, it acts as an adapter, leveraging existing structures
-like vectors and arrays to store raw audio data.
-The library provides adapter wrappers for these structures.
-The adapters implement traits that define a common set of methods
-for accessing and modifying audio samples.
-These methods enable the development of applications that can read
-and write audio data regardless of its layout and numerical representation.
+The `audioadapter` family consists of three crates:
+- [audioadapter](https://crates.io/crates/audioadapter):
+  This crate, that provides the traits such as [Adapter] and [AdapterMut].
+- [audioadapter-sample](https://crates.io/crates/audioadapter-sample): A companion crate
+  that provides sample format conversions as well as extensions to the standard `Read` and `Write` traits.
+- [audioadapter-buffers](https://crates.io/crates/audioadapter-buffers): A companion crate
+  that provides wrappers for various common data structures.
+
 
 ## Background
 Libraries and applications that process audio usually use
@@ -80,7 +80,7 @@ for channel in 0..data.channels() {
 }
 ```
 
-## Abstracting the data layout
+## Abstracting the data layout and sample format
 This module provides the traits [Adapter] and [AdapterMut].
 These enable basic reading and writing, with methods that access the sample values
 indirectly.
@@ -98,67 +98,12 @@ By accessing the audio data via the trait methods instead
 of indexing the data structure directly,
 an application or library becomes independant of how the data is stored.
 
-## Handling buffers of raw bytes
-Audio is often exchanged as buffers of raw bytes, and it is up to each application
-to treat those bytes as samples of the correct format.
-The [number_to_float] module is desgined to help with this.
-
-Example, wrap a buffer of bytes containing interleaved raw samples in 24-bit integer format,
-while converting them to f32:
-```rust
-use audioadapter::number_to_float::InterleavedNumbers;
-use audioadapter::Adapter;
-use audioadapter::sample::I24LE;
-
-// make a vector with some dummy data.
-// 2 channels * 3 frames * 3 bytes per sample => 18 bytes
-let data: Vec<u8> = vec![
-    1, 1, 1, //frame 1, left
-    2, 2, 2, //frame 1, right
-    3, 3, 3, //frame 2, left
-    4, 4, 4, //frame 2, right
-    5, 5, 5, //frame 3, left
-    6, 6, 6  //frame 3, right
-];
-
-// wrap the data
-let buffer = InterleavedNumbers::<&[I24LE<3>], f32>::new_from_bytes(&data, 2, 3).unwrap();
-
-// Loop over all samples and print their values
-for channel in 0..buffer.channels() {
-    for frame in 0..buffer.frames() {
-        let value = buffer.read_sample(channel, frame).unwrap();
-        println!(
-            "Channel: {}, frame: {}, value: {}",
-            channel, frame, value
-        );
-    }
-}
-```
-
-Note that the example uses `I24LE<3>`, which means 24-bit samples
-stored as 3 bytes in little-endian order without padding.
-24-bit samples are also commonly stored with a padding byte, so that each sample takes up four bytes.
-This is handled by selecting `I24LE<4>` as the format.
-
-## Reading and writing samples from types implementing `Read` and `Write`
-The [std::io::Read] and [std::io::Write] traits are useful for reading
-and writing raw bytes to and from for example files.
-The [readwrite] module extends these traits by providing methods for reading and writing samples,
-with on-the-fly conversion between bytes and the numerical values.
-
-Example
-```rust
-use audioadapter::sample::I16LE;
-use audioadapter::readwrite::ReadSamples;
-
-// make a vector with some dummy data.
-let data: Vec<u8> = vec![1, 2, 3, 4];
-// slices implement Read.
-let mut slice = &data[..];
-// read the first value as 16 bit integer, convert to f32.
-let float_value = slice.read_converted::<I16LE, f32>();
-```
+The companion crate [audioadapter-buffers](https://crates.io/crates/audioadapter-buffers)
+contains wrappers that implement the `audioadapter` traits
+that allow reading and writing samples from buffers of raw bytes,
+with optional conversion to and from floating point values.
+The format conversions are performed using the
+[audioadapter-sample](https://crates.io/crates/audioadapter-sample) crate.
 
 ## Compatibility with the [audio](https://crates.io/crates/audio) crate
 In addition to the provided wrappers, the [Adapter], [AdapterMut] traits are implemented for
@@ -179,9 +124,12 @@ buf.read_sample(0,0);
 
 ## Supporting new data structures
 The required trait methods are simple, to make is easy to implement them for
-data structures not covered by the built-in wrappers.
+new data structures.
+The tests of this crate includes a minimal implementation called `VecAdapter`,
+that is based on a normal vector. 
 
-There are default implementations for the functions that read and write slices.
+The [Adapter] and [AdapterMut] traits provide default implementations
+for the functions that read and write slices.
 These loop over the elements to read or write and clone element by element.
 These may be overriden if the wrapped data structure provides a more efficient way
 of cloning the data, such as [slice::clone_from_slice()].

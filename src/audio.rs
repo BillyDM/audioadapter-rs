@@ -116,10 +116,9 @@ mod tests {
         assert_eq!(buf.get_channel(1).unwrap().get(1).unwrap(), 4);
     }
 
-    #[cfg(feature = "std")]
     #[test]
     fn read_to_slice() {
-        let mut other = vec![0; 3];
+        let mut other = [0; 3];
         let buf = wrap::interleaved(&[1, 2, 3, 4, 5, 6, 7, 8], 2);
         buf.write_from_channel_to_slice(0, 1, &mut other);
         assert_eq!(other[0], 3);
@@ -127,10 +126,9 @@ mod tests {
         assert_eq!(other[2], 7);
     }
 
-    #[cfg(feature = "std")]
     #[test]
     fn write_to_slice() {
-        let other = vec![1, 2, 3];
+        let other = [1, 2, 3];
         let mut buf = audio::buf::Interleaved::<i32>::with_topology(2, 4);
         buf.write_from_slice_to_channel(0, 1, &other);
         assert_eq!(buf.get_channel(0).unwrap().get(0).unwrap(), 0);

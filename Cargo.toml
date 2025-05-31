@@ -12,8 +12,7 @@ categories = ["multimedia::audio"]
 readme = "README.md"
 
 [features]
-default = ["std", "audio"]
-std = []
+default = ["audio"]
 audio = ["audio-core"]
 
 [dependencies]

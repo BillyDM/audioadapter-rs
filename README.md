@@ -90,7 +90,7 @@ from one format to another when reading and writing from/to the underlying data.
 The crate also provides wrappers that implement the traits some or all of these traits
 for a number of common data structures used for storing audio data.
 
-Any type implementing [std::clone::Clone] can be used as the type for the samples.
+Any type implementing [core::clone::Clone] can be used as the type for the samples.
 This includes for example all the usual numeric types (`u8`, `f32` etc),
 as well as arrays and vectors of numbers (`Vec<i32>`, `[u8; 4]` etc). 
 

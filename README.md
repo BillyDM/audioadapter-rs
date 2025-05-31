@@ -121,7 +121,6 @@ let buf: audio::buf::Interleaved<i32> = audio::buf::Interleaved::with_topology(2
 buf.read_sample(0,0);
 ```
 
-
 ## Supporting new data structures
 The required trait methods are simple, in order to make is easy
 to implement them for new data structures.
@@ -135,7 +134,11 @@ These may be overriden if the wrapped data structure provides a more efficient w
 of cloning the data, such as [slice::clone_from_slice()].
 
 See also the `custom_adapter` example.
-This shows an implementation of [Adapter]
+This shows a minimal implementation of [Adapter]
 for a vector of strings.
+
+## Using without the standard library
+The `audioadapter` traits do not require the standard library,
+and can therefore be used in `no_std` environments.
 
 ## License: MIT

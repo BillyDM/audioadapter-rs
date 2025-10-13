@@ -37,17 +37,17 @@ pub trait Adapter<'a, T: 'a> {
     /// Get the number of frames stored in this buffer.
     fn frames(&self) -> usize;
 
-    /// Write values from a channel of the buffer to a slice.
-    /// The `skip` argument is the offset into the buffer channel
-    /// where the first value will be read from.
-    /// If the slice is longer than the available number of values in the channel of the buffer,
-    /// then only the available number of samples will be written.
+    /// Copy values from a channel of self to a slice.
+    /// The `skip` argument is the offset in samples from
+    /// where the first value will be copied.
+    /// If the target slice is longer than the available number of values in the channel,
+    /// then only the available number of samples will be copied.
     ///
-    /// Returns the number of values written.
+    /// Returns the number of values copied.
     /// If an invalid channel number is given,
     /// or if `skip` is larger than the length of the channel,
-    /// no samples will be written and zero is returned.
-    fn write_from_channel_to_slice(&self, channel: usize, skip: usize, slice: &mut [T]) -> usize {
+    /// no samples will be copied and zero is returned.
+    fn copy_from_channel_to_slice(&self, channel: usize, skip: usize, slice: &mut [T]) -> usize {
         if channel >= self.channels() || skip >= self.frames() {
             return 0;
         }
@@ -62,17 +62,17 @@ pub trait Adapter<'a, T: 'a> {
         frames_to_write
     }
 
-    /// Write values from a frame of the buffer to a slice.
-    /// The `skip` argument is the offset into the buffer frame
-    /// where the first value will be read from.
-    /// If the slice is longer than the available number of values in the buffer frame,
-    /// then only the available number of samples will be written.
+    /// Copy values from a frame of self to a slice.
+    /// The `skip` argument is the offset in samples from
+    /// where the first value will be copied.
+    /// If the slice is longer than the available number of values in the frame,
+    /// then only the available number of samples will be copied.
     ///
-    /// Returns the number of values written.
+    /// Returns the number of values copied.
     /// If an invalid frame number is given,
     /// or if `skip` is larger than the length of the frame,
-    /// no samples will be written and zero is returned.
-    fn write_from_frame_to_slice(&self, frame: usize, skip: usize, slice: &mut [T]) -> usize {
+    /// no samples will be copied and zero is returned.
+    fn copy_from_frame_to_slice(&self, frame: usize, skip: usize, slice: &mut [T]) -> usize {
         if frame >= self.frames() || skip >= self.channels() {
             return 0;
         }
@@ -126,21 +126,21 @@ where
         Some(unsafe { self.write_sample_unchecked(channel, frame, value) })
     }
 
-    /// Write values from a slice into a channel of the buffer.
-    /// The `skip` argument is the offset into the buffer channel
-    /// where the first value will be written.
-    /// If the slice is longer than the available space in the buffer channel,
-    /// then only the number of samples that fit will be read.
+    /// Copies values from a slice into a channel of self.
+    /// The `skip` argument is the offset into the channel to
+    /// where the first value will be copied.
+    /// If the slice is longer than the available space in the channel,
+    /// then only the number of samples that fit will be copied.
     ///
     /// Returns a tuple of two numbers.
-    /// The first is the number of values written,
+    /// The first is the number of values copied,
     /// and the second is the number of values that were clipped during conversion.
     /// Implementations that do not perform any conversion
     /// always return zero clipped samples.
     /// If an invalid channel number is given,
     /// or if `skip` is larger than the length of the channel,
-    /// no samples will be read and (0, 0) is returned.
-    fn write_from_slice_to_channel(
+    /// no samples will be copied and (0, 0) is returned.
+    fn copy_from_slice_to_channel(
         &mut self,
         channel: usize,
         skip: usize,
@@ -161,21 +161,21 @@ where
         (frames_to_read, nbr_clipped)
     }
 
-    /// Write values from a slice into a frame of the buffer.
-    /// The `skip` argument is the offset into the buffer frame
-    /// where the first value will be written.
-    /// If the slice is longer than the available space in the buffer frame,
-    /// then only the number of samples that fit will be read.
+    /// Copy values from a slice into a frame of self.
+    /// The `skip` argument is the offset into the frame to
+    /// where the first value will be copied.
+    /// If the slice is longer than the available space in the frame,
+    /// then only the number of samples that fit will be copied.
     ///
     /// Returns a tuple of two numbers.
-    /// The first is the number of values written,
+    /// The first is the number of values copied,
     /// and the second is the number of values that were clipped during conversion.
     /// Implementations that do not perform any conversion
     /// always return zero clipped samples.
     /// If an invalid frame number is given,
     /// or if `skip` is larger than the length of the frame,
-    /// no samples will be read and (0, 0) is returned.
-    fn write_from_slice_to_frame(
+    /// no samples will be copied and (0, 0) is returned.
+    fn copy_from_slice_to_frame(
         &mut self,
         frame: usize,
         skip: usize,
@@ -196,9 +196,9 @@ where
         (channels_to_read, nbr_clipped)
     }
 
-    /// Copy values from a channel of another buffer to self.
+    /// Copy values from a channel of another Adapter.
     /// The `self_skip` and `other_skip` arguments are the offsets
-    /// in frames for where copying starts in the two buffers.
+    /// in frames for where copying starts in the two channels.
     /// The method copies `take` values.
     ///
     /// Returns the the number of values that were clipped during conversion.
@@ -206,9 +206,9 @@ where
     /// always return zero clipped samples.
     ///
     /// If an invalid channel number is given,
-    /// or if either of the buffers is to short to copy `take` values,
+    /// or if either of the channels is to short to copy `take` values,
     /// no values will be copied and `None` is returned.
-    fn write_from_other_to_channel(
+    fn copy_from_other_to_channel(
         &mut self,
         other: &dyn Adapter<'a, T>,
         other_channel: usize,

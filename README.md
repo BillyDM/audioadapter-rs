@@ -38,7 +38,8 @@ the data can be ordered in two main ways.
   `L1, L2, L3, R1, R2, R3`
 - Keeping all samples for each frame together,
   and storing each frame after the previous.
-  This is normally called _interleaved_, and this is how the data in a .wav file is ordered.
+  This is normally called _interleaved_, and this is how the data in most
+  audio file formats such as .wav is ordered.
   The sample order of a stereo file with 3 frames becomes:
   `L1, R1, L2, R2, L3, R3`
 

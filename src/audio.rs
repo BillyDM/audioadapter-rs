@@ -24,7 +24,7 @@ where
         self.get_channel(channel).unwrap().get(frame).unwrap()
     }
 
-    fn write_from_channel_to_slice(&self, channel: usize, skip: usize, slice: &mut [T]) -> usize {
+    fn copy_from_channel_to_slice(&self, channel: usize, skip: usize, slice: &mut [T]) -> usize {
         if channel >= self.channels() || skip >= self.frames() {
             return 0;
         }
@@ -57,7 +57,7 @@ where
         false
     }
 
-    fn write_from_slice_to_channel(
+    fn copy_from_slice_to_channel(
         &mut self,
         channel: usize,
         skip: usize,
@@ -117,20 +117,20 @@ mod tests {
     }
 
     #[test]
-    fn read_to_slice() {
+    fn copy_to_slice() {
         let mut other = [0; 3];
         let buf = wrap::interleaved(&[1, 2, 3, 4, 5, 6, 7, 8], 2);
-        buf.write_from_channel_to_slice(0, 1, &mut other);
+        buf.copy_from_channel_to_slice(0, 1, &mut other);
         assert_eq!(other[0], 3);
         assert_eq!(other[1], 5);
         assert_eq!(other[2], 7);
     }
 
     #[test]
-    fn write_to_slice() {
+    fn copy_from_slice() {
         let other = [1, 2, 3];
         let mut buf = audio::buf::Interleaved::<i32>::with_topology(2, 4);
-        buf.write_from_slice_to_channel(0, 1, &other);
+        buf.copy_from_slice_to_channel(0, 1, &other);
         assert_eq!(buf.get_channel(0).unwrap().get(0).unwrap(), 0);
         assert_eq!(buf.get_channel(0).unwrap().get(1).unwrap(), 1);
         assert_eq!(buf.get_channel(0).unwrap().get(2).unwrap(), 2);

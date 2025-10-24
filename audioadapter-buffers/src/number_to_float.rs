@@ -12,7 +12,7 @@
 //! Wrap a Vec of 16-bit integer samples as an interleaved buffer
 //! and print all the values.
 //! ```
-//! use audioadapter::number_to_float::InterleavedNumbers;
+//! use audioadapter_buffers::number_to_float::InterleavedNumbers;
 //! use audioadapter::Adapter;
 //!
 //! // make a vector with some data.
@@ -38,9 +38,9 @@
 //! Wrap a Vec of bytes as an interleaved buffer of 16-bit little endian
 //! integer samples and print all the values.
 //! ```
-//! use audioadapter::number_to_float::InterleavedNumbers;
+//! use audioadapter_buffers::number_to_float::InterleavedNumbers;
 //! use audioadapter::Adapter;
-//! use audioadapter::sample::I16LE;
+//! use audioadapter_sample::sample::I16LE;
 //!
 //! // make a vector with some dummy data.
 //! // 2 channels * 3 frames * 2 bytes per sample => 12 bytes
@@ -63,11 +63,11 @@ use core::mem::size_of;
 
 use num_traits::Float;
 
-use crate::sample::RawSample;
 use crate::slicetools::copy_within_slice;
 use crate::SizeError;
 use crate::{check_slice_length, implement_size_getters};
-use crate::{Adapter, AdapterMut};
+use audioadapter::{Adapter, AdapterMut};
+use audioadapter_sample::sample::RawSample;
 
 /// A macro for creating a view of an immutable slice of bytes
 /// as a different type.
@@ -398,7 +398,7 @@ impl_traits_newtype!(SequentialNumbers);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sample::{I16LE, I24LE};
+    use audioadapter_sample::sample::{I16LE, I24LE};
 
     #[test]
     fn read_i32() {
@@ -493,8 +493,8 @@ mod tests {
         let mut data = [0; 6];
         let mut buffer = InterleavedNumbers::<_, f32>::new_mut(&mut data, 2, 3).unwrap();
 
-        buffer.write_from_slice_to_channel(0, 0, &values_left);
-        buffer.write_from_slice_to_channel(1, 0, &values_right);
+        buffer.copy_from_slice_to_channel(0, 0, &values_left);
+        buffer.copy_from_slice_to_channel(1, 0, &values_right);
         assert_eq!(data, expected_data);
     }
 
@@ -507,8 +507,8 @@ mod tests {
         let mut values_right = [0.0; 3];
         let buffer: InterleavedNumbers<_, f32> = InterleavedNumbers::new(&data, 2, 3).unwrap();
 
-        buffer.write_from_channel_to_slice(0, 0, &mut values_left);
-        buffer.write_from_channel_to_slice(1, 0, &mut values_right);
+        buffer.copy_from_channel_to_slice(0, 0, &mut values_left);
+        buffer.copy_from_channel_to_slice(1, 0, &mut values_right);
         assert_eq!(values_left, expected_left);
         assert_eq!(values_right, expected_right);
     }

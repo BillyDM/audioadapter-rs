@@ -1,6 +1,8 @@
-use audioadapter::sample::*;
 use audioadapter::*;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use audioadapter_buffers::{direct, number_to_float};
+use audioadapter_sample::sample::*;
+use criterion::{criterion_group, criterion_main, Criterion};
+use std::hint::black_box;
 
 // plain nested loops with unsafe read calls
 fn iter_with_unchecked_loop(buf: &direct::SequentialSliceOfVecs<&[Vec<i32>]>) -> i32 {

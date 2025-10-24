@@ -18,7 +18,17 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Publish
-        run: cargo publish --token ${CARGO_REGISTRY_TOKEN}
+      - name: Publish audioadapter crate
+        run: cargo publish -p audioadapter --token ${CARGO_REGISTRY_TOKEN}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Publish buffers crate
+        run: cargo publish -p audioadapter-buffers --token ${CARGO_REGISTRY_TOKEN}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Publish sample crate
+        run: cargo publish -p audioadapter-sample --token ${CARGO_REGISTRY_TOKEN}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

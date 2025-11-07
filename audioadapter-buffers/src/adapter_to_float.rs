@@ -38,7 +38,7 @@
 use num_traits::Float;
 
 use audioadapter::{Adapter, AdapterMut};
-use audioadapter_sample::sample::{BytesSample, RawSample, I16LE};
+use audioadapter_sample::sample::{BytesSample, RawSample, I16_LE};
 
 macro_rules! implement_wrapped_size_getters {
     () => {
@@ -149,7 +149,7 @@ macro_rules! byte_convert_traits_newtype {
         }
 }
 
-byte_convert_traits_newtype!(I16LE);
+byte_convert_traits_newtype!(I16_LE);
 
 /// A wrapper for an [Adapter] or [AdapterMut] buffer containing samples
 /// stored as numeric types.
@@ -250,7 +250,7 @@ mod tests {
     fn read_i16_bytes() {
         let data: [[u8; 2]; 6] = [[0, 0], [0, 128], [0, 64], [0, 192], [0, 32], [0, 224]];
         let buffer: InterleavedSlice<&[[u8; 2]]> = InterleavedSlice::new(&data, 2, 3).unwrap();
-        let converter: ConvertBytes<f32, I16LE, _> =
+        let converter: ConvertBytes<f32, I16_LE, _> =
             ConvertBytes::new(&buffer as &dyn Adapter<[u8; 2]>);
         assert_eq!(converter.read_sample(0, 0).unwrap(), 0.0);
         assert_eq!(converter.read_sample(1, 0).unwrap(), -1.0);
@@ -280,7 +280,7 @@ mod tests {
         let mut data = [[0, 0]; 6];
         let mut buffer: InterleavedSlice<&mut [[u8; 2]]> =
             InterleavedSlice::new_mut(&mut data, 2, 3).unwrap();
-        let mut converter: ConvertBytes<f32, I16LE, _> =
+        let mut converter: ConvertBytes<f32, I16_LE, _> =
             ConvertBytes::new_mut(&mut buffer as &mut dyn AdapterMut<[u8; 2]>);
         converter.write_sample(0, 0, &0.0).unwrap();
         converter.write_sample(1, 0, &-1.0).unwrap();

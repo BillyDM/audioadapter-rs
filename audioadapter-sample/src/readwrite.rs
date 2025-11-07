@@ -531,18 +531,18 @@ mod tests {
     fn test_read_number_i16() {
         let data: Vec<u8> = vec![0, 1, 2, 3];
         let mut slice = &data[..];
-        assert_eq!(slice.read_number::<I16LE>().unwrap(), 256);
-        assert_eq!(slice.read_number::<I16LE>().unwrap(), 3 * 256 + 2);
-        assert!(slice.read_number::<I16LE>().is_err());
+        assert_eq!(slice.read_number::<I16_LE>().unwrap(), 256);
+        assert_eq!(slice.read_number::<I16_LE>().unwrap(), 3 * 256 + 2);
+        assert!(slice.read_number::<I16_LE>().is_err());
     }
 
     #[test]
     fn test_read_converted_i16() {
         let data: Vec<u8> = vec![0, 64, 0, 32];
         let mut slice = &data[..];
-        assert_eq!(slice.read_converted::<I16LE, f32>().unwrap(), 0.5);
-        assert_eq!(slice.read_converted::<I16LE, f32>().unwrap(), 0.25);
-        assert!(slice.read_converted::<I16LE, f32>().is_err());
+        assert_eq!(slice.read_converted::<I16_LE, f32>().unwrap(), 0.5);
+        assert_eq!(slice.read_converted::<I16_LE, f32>().unwrap(), 0.25);
+        assert!(slice.read_converted::<I16_LE, f32>().is_err());
     }
 
     #[test]
@@ -550,9 +550,9 @@ mod tests {
         let data: Vec<u8> = vec![0, 1, 2, 3];
         let mut slice = &data[..];
         let mut buf = [0; 2];
-        slice.read_numbers_exact::<I16LE>(&mut buf).unwrap();
+        slice.read_numbers_exact::<I16_LE>(&mut buf).unwrap();
         assert_eq!(buf, [256, 3 * 256 + 2]);
-        assert!(slice.read_numbers_exact::<I16LE>(&mut buf).is_err());
+        assert!(slice.read_numbers_exact::<I16_LE>(&mut buf).is_err());
     }
 
     #[test]
@@ -560,9 +560,9 @@ mod tests {
         let data: Vec<u8> = vec![0, 64, 0, 32];
         let mut slice = &data[..];
         let mut buf = [0.0; 2];
-        slice.read_converted_exact::<I16LE, f32>(&mut buf).unwrap();
+        slice.read_converted_exact::<I16_LE, f32>(&mut buf).unwrap();
         assert_eq!(buf, [0.5, 0.25]);
-        assert!(slice.read_converted_exact::<I16LE, f32>(&mut buf).is_err());
+        assert!(slice.read_converted_exact::<I16_LE, f32>(&mut buf).is_err());
     }
 
     #[test]
@@ -572,13 +572,13 @@ mod tests {
         let mut slice = &data[..];
         let mut buf = Vec::new();
         slice
-            .read_numbers_to_limit_or_end::<I16LE>(&mut buf, None)
+            .read_numbers_to_limit_or_end::<I16_LE>(&mut buf, None)
             .unwrap();
         assert_eq!(buf, [256, 3 * 256 + 2, 5 * 256 + 4, 7 * 256 + 6]);
         let mut slice2 = &data[..];
         let mut buf2 = Vec::new();
         slice2
-            .read_numbers_to_limit_or_end::<I16LE>(&mut buf2, Some(2))
+            .read_numbers_to_limit_or_end::<I16_LE>(&mut buf2, Some(2))
             .unwrap();
         assert_eq!(buf2, [256, 3 * 256 + 2]);
     }
@@ -590,13 +590,13 @@ mod tests {
         let mut slice = &data[..];
         let mut buf = Vec::new();
         slice
-            .read_converted_to_limit_or_end::<I16LE, f32>(&mut buf, None)
+            .read_converted_to_limit_or_end::<I16_LE, f32>(&mut buf, None)
             .unwrap();
         assert_eq!(buf, [0.5, 0.25, 0.125, 0.0625]);
         let mut slice2 = &data[..];
         let mut buf2 = Vec::new();
         slice2
-            .read_converted_to_limit_or_end::<I16LE, f32>(&mut buf2, Some(2))
+            .read_converted_to_limit_or_end::<I16_LE, f32>(&mut buf2, Some(2))
             .unwrap();
         assert_eq!(buf2, [0.5, 0.25]);
     }
@@ -604,30 +604,32 @@ mod tests {
     #[test]
     fn test_write_number_i16() {
         let mut buf = Vec::new();
-        buf.write_number::<I16LE>(256).unwrap();
-        buf.write_number::<I16LE>(3 * 256 + 2).unwrap();
+        buf.write_number::<I16_LE>(256).unwrap();
+        buf.write_number::<I16_LE>(3 * 256 + 2).unwrap();
         assert_eq!(buf, [0, 1, 2, 3]);
     }
 
     #[test]
     fn test_write_converted_i16() {
         let mut buf = Vec::new();
-        buf.write_converted::<I16LE, f32>(0.5).unwrap();
-        buf.write_converted::<I16LE, f32>(0.25).unwrap();
+        buf.write_converted::<I16_LE, f32>(0.5).unwrap();
+        buf.write_converted::<I16_LE, f32>(0.25).unwrap();
         assert_eq!(buf, [0, 64, 0, 32]);
     }
 
     #[test]
     fn test_write_all_numbers_i16() {
         let mut buf = Vec::new();
-        buf.write_all_numbers::<I16LE>(&[256, 3 * 256 + 2]).unwrap();
+        buf.write_all_numbers::<I16_LE>(&[256, 3 * 256 + 2])
+            .unwrap();
         assert_eq!(buf, [0, 1, 2, 3]);
     }
 
     #[test]
     fn test_write_all_converted_i16() {
         let mut buf = Vec::new();
-        buf.write_all_converted::<I16LE, f32>(&[0.5, 0.25]).unwrap();
+        buf.write_all_converted::<I16_LE, f32>(&[0.5, 0.25])
+            .unwrap();
         assert_eq!(buf, [0, 64, 0, 32]);
     }
 }

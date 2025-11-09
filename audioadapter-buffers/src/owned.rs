@@ -168,6 +168,46 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        let source_index = self.calc_index(source_channel, source_frame);
+        let target_index = self.calc_index(target_channel, target_frame);
+        self.buf[target_index] = self.buf[source_index].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let index_a = self.calc_index(channel_a, frame_a);
+        let index_b = self.calc_index(channel_b, frame_b);
+        self.buf.swap(index_a, index_b);
+        true
+    }
 }
 
 //
@@ -294,6 +334,46 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        let source_index = self.calc_index(source_channel, source_frame);
+        let target_index = self.calc_index(target_channel, target_frame);
+        self.buf[target_index] = self.buf[source_index].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let index_a = self.calc_index(channel_a, frame_a);
+        let index_b = self.calc_index(channel_b, frame_b);
+        self.buf.swap(index_a, index_b);
+        true
+    }
 }
 
 //   _____         _
@@ -305,6 +385,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use audioadapter::tests::test_adapter_mut_methods;
 
     fn insert_data(buffer: &mut dyn AdapterMut<i32>) {
         buffer.write_sample(0, 0, &1);
@@ -468,5 +549,17 @@ mod tests {
         let expected: [i32; 6] = [2; 6];
         let data = buffer.take_data();
         assert_eq!(data, expected);
+    }
+
+    #[test]
+    fn test_interleaved_owned_with_generic_tester() {
+        let mut buffer = InterleavedOwned::new(0usize, 2, 4);
+        test_adapter_mut_methods(&mut buffer);
+    }
+
+    #[test]
+    fn test_sequential_owned_with_generic_tester() {
+        let mut buffer = SequentialOwned::new(0usize, 2, 4);
+        test_adapter_mut_methods(&mut buffer);
     }
 }

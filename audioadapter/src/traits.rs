@@ -290,9 +290,11 @@ where
 
     /// Copy frames within the buffer.
     /// Copying is performed for all channels.
-    /// Copies (by cloning) `count` frames, from the range `src..src+count`,
+    /// Copies `count` frames, from the range `src..src+count`,
     /// to the range `dest..dest+count`.
     /// The two regions are allowed to overlap.
+    /// The default implementation copies by calling the read and write methods,
+    /// while type specific implementations can use more efficient methods.
     fn copy_frames_within(&mut self, src: usize, dest: usize, count: usize) -> Option<usize> {
         if src + count > self.frames() || dest + count > self.frames() {
             return None;
@@ -324,5 +326,288 @@ where
             }
         }
         Some(count)
+    }
+
+    /// Copy a single sample within the buffer.
+    /// Copies from the source to the target frame and channel.
+    /// Returns `true` if the sample was copied, and `false` if not,
+    /// which may happen if the source or target frame or channel was out of bounds.
+    /// The default implementation copies by calling the read and write methods,
+    /// while type specific implementations can use more efficient methods.
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if let Some(value) = self.read_sample(source_channel, source_frame) {
+            if self
+                .write_sample(target_channel, target_frame, &value)
+                .is_some()
+            {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Swap two samples in the buffer.
+    /// Returns `true` if the samples were swapped, and `false` if not,
+    /// which may happen if the channel or frame for either sample was out of bounds.
+    /// The default implementation copies by calling the read and write methods,
+    /// while type specific implementations can use more efficient methods.
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if let Some(value_a) = self.read_sample(channel_a, frame_a) {
+            if let Some(value_b) = self.read_sample(channel_b, frame_b) {
+                // both values could be read, thus both frame&channel combinations are valid
+                unsafe {
+                    self.write_sample_unchecked(channel_b, frame_b, &value_a);
+                    self.write_sample_unchecked(channel_a, frame_a, &value_b);
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+//   _____         _
+//  |_   _|__  ___| |_ ___
+//    | |/ _ \/ __| __/ __|
+//    | |  __/\__ \ |_\__ \
+//    |_|\___||___/\__|___/
+
+#[cfg(test)]
+mod tests {
+    use crate::tests::MinimalAdapter;
+    use crate::{Adapter, AdapterMut};
+
+    fn dummy_adapter() -> MinimalAdapter<i32> {
+        let data = vec![1_i32, 1, 2, 3, 4, 5, 6, 7];
+        MinimalAdapter::new_from_vec(data, 2, 4)
+    }
+
+    #[test]
+    fn read_sample() {
+        let buffer = dummy_adapter();
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(1, 3), Some(7));
+        assert_eq!(buffer.read_sample(2, 0), None); // OOB channel
+        assert_eq!(buffer.read_sample(0, 4), None); // OOB frame
+    }
+
+    #[test]
+    fn copy_from_channel_to_slice() {
+        let buffer = dummy_adapter();
+        let mut slice = [0; 3];
+        // ch 0 is [1, 2, 4, 6]
+        let copied = buffer.copy_from_channel_to_slice(0, 1, &mut slice);
+        assert_eq!(copied, 3);
+        assert_eq!(slice, [2, 4, 6]);
+
+        // OOB channel
+        let mut slice2 = [0; 2];
+        let copied = buffer.copy_from_channel_to_slice(2, 0, &mut slice2);
+        assert_eq!(copied, 0);
+        assert_eq!(slice2, [0, 0]);
+
+        // OOB skip
+        let copied = buffer.copy_from_channel_to_slice(0, 4, &mut slice2);
+        assert_eq!(copied, 0);
+
+        // Slice larger than available frames
+        let mut slice3 = [0; 5];
+        let copied = buffer.copy_from_channel_to_slice(0, 0, &mut slice3);
+        assert_eq!(copied, 4);
+        assert_eq!(slice3, [1, 2, 4, 6, 0]);
+    }
+
+    #[test]
+    fn copy_from_frame_to_slice() {
+        let buffer = dummy_adapter();
+        let mut slice = [0; 1];
+        // frame 1 is [2, 3]
+        let copied = buffer.copy_from_frame_to_slice(1, 1, &mut slice);
+        assert_eq!(copied, 1);
+        assert_eq!(slice, [3]);
+
+        // OOB frame
+        let mut slice2 = [0; 2];
+        let copied = buffer.copy_from_frame_to_slice(4, 0, &mut slice2);
+        assert_eq!(copied, 0);
+        assert_eq!(slice2, [0, 0]);
+
+        // OOB skip
+        let copied = buffer.copy_from_frame_to_slice(0, 2, &mut slice2);
+        assert_eq!(copied, 0);
+
+        // Slice larger than available channels
+        let mut slice3 = [0; 3];
+        let copied = buffer.copy_from_frame_to_slice(1, 0, &mut slice3);
+        assert_eq!(copied, 2);
+        assert_eq!(slice3, [2, 3, 0]);
+    }
+
+    #[test]
+    fn write_sample() {
+        let mut buffer = dummy_adapter();
+        assert_eq!(buffer.write_sample(0, 0, &100), Some(false));
+        assert_eq!(buffer.read_sample(0, 0), Some(100));
+        assert_eq!(buffer.write_sample(2, 0, &101), None); // OOB channel
+        assert_eq!(buffer.write_sample(0, 4, &102), None); // OOB frame
+    }
+
+    #[test]
+    fn copy_from_slice_to_channel() {
+        let mut buffer = dummy_adapter();
+        let slice = [10, 11];
+        let (copied, clipped) = buffer.copy_from_slice_to_channel(0, 1, &slice);
+        assert_eq!(copied, 2);
+        assert_eq!(clipped, 0);
+        // ch 0 was [1, 2, 4, 6], now [1, 10, 11, 6]
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(0, 1), Some(10));
+        assert_eq!(buffer.read_sample(0, 2), Some(11));
+        assert_eq!(buffer.read_sample(0, 3), Some(6));
+    }
+
+    #[test]
+    fn copy_from_slice_to_frame() {
+        let mut buffer = dummy_adapter();
+        let slice = [10];
+        let (copied, clipped) = buffer.copy_from_slice_to_frame(1, 1, &slice);
+        assert_eq!(copied, 1);
+        assert_eq!(clipped, 0);
+        // frame 1 was [2, 3], now [2, 10]
+        assert_eq!(buffer.read_sample(0, 1), Some(2));
+        assert_eq!(buffer.read_sample(1, 1), Some(10));
+    }
+
+    #[test]
+    fn copy_from_other_to_channel() {
+        let mut buffer = dummy_adapter();
+        let other = dummy_adapter();
+        // copy ch1 from other to ch0 in buffer
+        // other ch1: [1, 3, 5, 7]
+        let clipped = buffer.copy_from_other_to_channel(&other, 1, 0, 0, 0, 4);
+        assert_eq!(clipped, Some(0));
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(0, 1), Some(3));
+        assert_eq!(buffer.read_sample(0, 2), Some(5));
+        assert_eq!(buffer.read_sample(0, 3), Some(7));
+    }
+
+    #[test]
+    fn fill_channel_with() {
+        let mut buffer = dummy_adapter();
+        buffer.fill_channel_with(0, &9).unwrap();
+        assert_eq!(buffer.read_sample(0, 0), Some(9));
+        assert_eq!(buffer.read_sample(0, 1), Some(9));
+        assert_eq!(buffer.read_sample(0, 2), Some(9));
+        assert_eq!(buffer.read_sample(0, 3), Some(9));
+        assert_eq!(buffer.read_sample(1, 0), Some(1)); // other channel unaffected
+    }
+
+    #[test]
+    fn fill_frame_with() {
+        let mut buffer = dummy_adapter();
+        buffer.fill_frame_with(1, &9).unwrap();
+        assert_eq!(buffer.read_sample(0, 1), Some(9));
+        assert_eq!(buffer.read_sample(1, 1), Some(9));
+        assert_eq!(buffer.read_sample(0, 0), Some(1)); // other frame unaffected
+    }
+
+    #[test]
+    fn fill_frames_with() {
+        let mut buffer = dummy_adapter();
+        buffer.fill_frames_with(1, 2, &9).unwrap();
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(0, 1), Some(9));
+        assert_eq!(buffer.read_sample(0, 2), Some(9));
+        assert_eq!(buffer.read_sample(0, 3), Some(6));
+    }
+
+    #[test]
+    fn fill_with() {
+        let mut buffer = dummy_adapter();
+        buffer.fill_with(&9);
+        for f in 0..buffer.frames() {
+            for c in 0..buffer.channels() {
+                assert_eq!(buffer.read_sample(c, f), Some(9));
+            }
+        }
+    }
+
+    #[test]
+    fn copy_frames_within_forward_overlap() {
+        let mut buffer = dummy_adapter();
+        // copy 2 frames from frame 0 to frame 1.
+        // Before: F0:[1,1], F1:[2,3], F2:[4,5], F3:[6,7]
+        // After:  F0:[1,1], F1:[1,1], F2:[2,3], F3:[6,7]
+        let copied = buffer.copy_frames_within(0, 1, 2).unwrap();
+        assert_eq!(copied, 2);
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(1, 0), Some(1));
+        assert_eq!(buffer.read_sample(0, 1), Some(1));
+        assert_eq!(buffer.read_sample(1, 1), Some(1));
+        assert_eq!(buffer.read_sample(0, 2), Some(2));
+        assert_eq!(buffer.read_sample(1, 2), Some(3));
+        assert_eq!(buffer.read_sample(0, 3), Some(6));
+        assert_eq!(buffer.read_sample(1, 3), Some(7));
+    }
+
+    #[test]
+    fn copy_frames_within_backward_overlap() {
+        let mut buffer = dummy_adapter();
+        // copy 2 frames from frame 1 to frame 0.
+        // Before: F0:[1,1], F1:[2,3], F2:[4,5], F3:[6,7]
+        // After:  F0:[2,3], F1:[4,5], F2:[4,5], F3:[6,7]
+        let copied = buffer.copy_frames_within(1, 0, 2).unwrap();
+        assert_eq!(copied, 2);
+        assert_eq!(buffer.read_sample(0, 0), Some(2));
+        assert_eq!(buffer.read_sample(1, 0), Some(3));
+        assert_eq!(buffer.read_sample(0, 1), Some(4));
+        assert_eq!(buffer.read_sample(1, 1), Some(5));
+        assert_eq!(buffer.read_sample(0, 2), Some(4));
+        assert_eq!(buffer.read_sample(1, 2), Some(5));
+        assert_eq!(buffer.read_sample(0, 3), Some(6));
+        assert_eq!(buffer.read_sample(1, 3), Some(7));
+    }
+
+    #[test]
+    fn copy_sample_within() {
+        let mut buffer = dummy_adapter();
+        // Before: (0,0) is 1, (1,1) is 3
+        let success = buffer.copy_sample_within(0, 0, 1, 1);
+        // After: (0,0) is 1, (1,1) is 1
+        assert!(success);
+        assert_eq!(buffer.read_sample(0, 0), Some(1));
+        assert_eq!(buffer.read_sample(1, 1), Some(1));
+
+        // OOB source
+        assert!(!buffer.copy_sample_within(2, 0, 0, 0));
+        // OOB target
+        assert!(!buffer.copy_sample_within(0, 0, 2, 0));
+    }
+
+    #[test]
+    fn swap_samples() {
+        let mut buffer = dummy_adapter();
+        // Before: (0,0) is 1, (1,1) is 3
+        let success = buffer.swap_samples(0, 0, 1, 1);
+        // After: (0,0) is 3, (1,1) is 1
+        assert!(success);
+        assert_eq!(buffer.read_sample(0, 0), Some(3));
+        assert_eq!(buffer.read_sample(1, 1), Some(1));
+
+        // OOB
+        assert!(!buffer.swap_samples(0, 0, 2, 0));
     }
 }

@@ -125,7 +125,7 @@ buf.read_sample(0,0);
 ## Supporting new data structures
 The required trait methods are simple, in order to make is easy
 to implement them for new data structures.
-The tests of this crate includes a minimal implementation called `VecAdapter`,
+The tests of this crate includes a minimal implementation called `MinimalAdapter`,
 that is based on a normal vector. 
 
 The [Adapter] and [AdapterMut] traits provide default implementations

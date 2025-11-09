@@ -382,6 +382,46 @@ macro_rules! impl_traits_newtype {
             ) -> Option<usize> {
                 self.copy_frames_within_impl(src, dest, count)
             }
+
+            fn copy_sample_within(
+                &mut self,
+                source_channel: usize,
+                source_frame: usize,
+                target_channel: usize,
+                target_frame: usize,
+            ) -> bool {
+                if source_channel >= self.channels
+                    || source_frame >= self.frames
+                    || target_channel >= self.channels
+                    || target_frame >= self.frames
+                {
+                    return false;
+                }
+                let source_index = self.calc_index(source_channel, source_frame);
+                let target_index = self.calc_index(target_channel, target_frame);
+                self.buf[target_index] = self.buf[source_index].clone();
+                true
+            }
+
+            fn swap_samples(
+                &mut self,
+                channel_a: usize,
+                frame_a: usize,
+                channel_b: usize,
+                frame_b: usize,
+            ) -> bool {
+                if channel_a >= self.channels
+                    || frame_a >= self.frames
+                    || channel_b >= self.channels
+                    || frame_b >= self.frames
+                {
+                    return false;
+                }
+                let index_a = self.calc_index(channel_a, frame_a);
+                let index_b = self.calc_index(channel_b, frame_b);
+                self.buf.swap(index_a, index_b);
+                true
+            }
         }
     };
 }

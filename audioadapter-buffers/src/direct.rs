@@ -250,6 +250,44 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        self.buf[target_channel][target_frame] = self.buf[source_channel][source_frame].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let temp = self.buf[channel_a][frame_a].clone();
+        self.buf[channel_a][frame_a] = self.buf[channel_b][frame_b].clone();
+        self.buf[channel_b][frame_b] = temp;
+        true
+    }
 }
 
 //
@@ -421,6 +459,48 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+            || !self.mask[source_channel]
+            || !self.mask[target_channel]
+        {
+            return false;
+        }
+        self.buf[target_channel][target_frame] = self.buf[source_channel][source_frame].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+            || !self.mask[channel_a]
+            || !self.mask[channel_b]
+        {
+            return false;
+        }
+        let temp = self.buf[channel_a][frame_a].clone();
+        self.buf[channel_a][frame_a] = self.buf[channel_b][frame_b].clone();
+        self.buf[channel_b][frame_b] = temp;
+        true
+    }
 }
 
 //
@@ -554,6 +634,44 @@ where
         };
         self.buf[frame][skip..skip + channels_to_read].clone_from_slice(&slice[..channels_to_read]);
         (channels_to_read, 0)
+    }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        self.buf[target_frame][target_channel] = self.buf[source_frame][source_channel].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let temp = self.buf[frame_a][channel_a].clone();
+        self.buf[frame_a][channel_a] = self.buf[frame_b][channel_b].clone();
+        self.buf[frame_b][channel_b] = temp;
+        true
     }
 }
 
@@ -709,6 +827,46 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        let source_index = self.calc_index(source_channel, source_frame);
+        let target_index = self.calc_index(target_channel, target_frame);
+        self.buf[target_index] = self.buf[source_index].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let index_a = self.calc_index(channel_a, frame_a);
+        let index_b = self.calc_index(channel_b, frame_b);
+        self.buf.swap(index_a, index_b);
+        true
+    }
 }
 
 //
@@ -862,6 +1020,46 @@ where
         }
         Some(count)
     }
+
+    fn copy_sample_within(
+        &mut self,
+        source_channel: usize,
+        source_frame: usize,
+        target_channel: usize,
+        target_frame: usize,
+    ) -> bool {
+        if source_channel >= self.channels
+            || source_frame >= self.frames
+            || target_channel >= self.channels
+            || target_frame >= self.frames
+        {
+            return false;
+        }
+        let source_index = self.calc_index(source_channel, source_frame);
+        let target_index = self.calc_index(target_channel, target_frame);
+        self.buf[target_index] = self.buf[source_index].clone();
+        true
+    }
+
+    fn swap_samples(
+        &mut self,
+        channel_a: usize,
+        frame_a: usize,
+        channel_b: usize,
+        frame_b: usize,
+    ) -> bool {
+        if channel_a >= self.channels
+            || frame_a >= self.frames
+            || channel_b >= self.channels
+            || frame_b >= self.frames
+        {
+            return false;
+        }
+        let index_a = self.calc_index(channel_a, frame_a);
+        let index_b = self.calc_index(channel_b, frame_b);
+        self.buf.swap(index_a, index_b);
+        true
+    }
 }
 
 //   _____         _
@@ -873,6 +1071,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use audioadapter::tests::test_adapter_mut_methods;
 
     fn insert_data(buffer: &mut dyn AdapterMut<i32>) {
         buffer.write_sample(0, 0, &1).unwrap();
@@ -1121,5 +1320,44 @@ mod tests {
         let mut data = vec![vec![0; 10]; 2];
         let mut adapter = SequentialSliceOfVecs::new_mut(&mut data, 2, 10).unwrap();
         check_copy_within(&mut adapter);
+    }
+
+    #[test]
+    fn test_interleaved_slice_with_generic_tester() {
+        let mut data = vec![0usize; 8];
+        let mut buffer = InterleavedSlice::new_mut(&mut data, 2, 4).unwrap();
+        test_adapter_mut_methods(&mut buffer);
+    }
+
+    #[test]
+    fn test_sequential_slice_with_generic_tester() {
+        let mut data = vec![0usize; 8];
+        let mut buffer = SequentialSlice::new_mut(&mut data, 2, 4).unwrap();
+        test_adapter_mut_methods(&mut buffer);
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn test_interleaved_slice_of_vecs_with_generic_tester() {
+        let mut data = vec![vec![0usize; 2]; 4];
+        let mut buffer = InterleavedSliceOfVecs::new_mut(&mut data, 2, 4).unwrap();
+        test_adapter_mut_methods(&mut buffer);
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn test_sequential_slice_of_vecs_with_generic_tester() {
+        let mut data = vec![vec![0usize; 4]; 2];
+        let mut buffer = SequentialSliceOfVecs::new_mut(&mut data, 2, 4).unwrap();
+        test_adapter_mut_methods(&mut buffer);
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn test_sparse_sequential_slice_of_vecs_with_generic_tester() {
+        let mut data = vec![vec![0usize; 4], vec![0usize; 4]];
+        let mask = [true, true];
+        let mut buffer = SparseSequentialSliceOfVecs::new_mut(&mut data, 2, 4, &mask).unwrap();
+        test_adapter_mut_methods(&mut buffer);
     }
 }

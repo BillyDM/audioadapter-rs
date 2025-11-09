@@ -17,12 +17,13 @@ std = ["audioadapter-sample/std"]
 
 [dependencies]
 num-traits = "0.2.15"
-audioadapter = { version = "1.0.0", path = "../audioadapter" }
+audioadapter = { version = "2.0.0", path = "../audioadapter" }
 audioadapter-sample = { version = "2.0.0", path = "../audioadapter-sample", default-features = false, features = ["audio"] }
 
 
 [dev-dependencies]
 criterion = "0.6"
+audioadapter = { version = "2.0.0", path = "../audioadapter", features = ["test-utils"]}
 
 [[bench]]
 name = "iteration"

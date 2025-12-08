@@ -86,7 +86,7 @@ for channel in 0..buffer.channels() {
 Note that the example uses `I24_LE`, which means 24-bit samples
 stored as 3 bytes in little-endian order without padding.
 24-bit samples are also commonly stored with a padding byte, so that each sample takes up four bytes.
-This is handled by selecting `I24_4RJ_LE` or `I24_LJ_LE` as the format.
+This is handled by selecting `I24_4RJ_LE` or `I24_4LJ_LE` as the format.
 
 ## Use without the standard library
 This crate can be used in `no_std` environments if the `std` Cargo feature is disabled.

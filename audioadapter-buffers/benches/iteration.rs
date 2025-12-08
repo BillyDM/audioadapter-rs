@@ -65,7 +65,7 @@ pub fn bench_with_iter_trait(c: &mut Criterion) {
 
 // use the iterators with format conversion
 fn iter_with_i32le_float_conversion(
-    buf: &number_to_float::SequentialNumbers<&[I32LE], f32>,
+    buf: &number_to_float::SequentialNumbers<&[I32_LE], f32>,
 ) -> f32 {
     let mut sum = 0.0;
     for channel in buf.iter_channels() {
@@ -79,7 +79,7 @@ fn iter_with_i32le_float_conversion(
 pub fn bench_with_i32le_float_conversion(c: &mut Criterion) {
     let data = vec![1_u8; 80000];
     let buffer =
-        number_to_float::SequentialNumbers::<&[I32LE], f32>::new_from_bytes(&data, 2, 10000)
+        number_to_float::SequentialNumbers::<&[I32_LE], f32>::new_from_bytes(&data, 2, 10000)
             .unwrap();
     c.bench_function("convert_i32le_to_float", |b| {
         b.iter(|| black_box(iter_with_i32le_float_conversion(black_box(&buffer))))
@@ -88,7 +88,7 @@ pub fn bench_with_i32le_float_conversion(c: &mut Criterion) {
 
 // use the iterators with format conversion
 fn iter_with_i24le_float_conversion(
-    buf: &number_to_float::SequentialNumbers<&[I24LE<3>], f32>,
+    buf: &number_to_float::SequentialNumbers<&[I24_LE], f32>,
 ) -> f32 {
     let mut sum = 0.0;
     for channel in buf.iter_channels() {
@@ -102,7 +102,7 @@ fn iter_with_i24le_float_conversion(
 pub fn bench_with_i24le_float_conversion(c: &mut Criterion) {
     let data = vec![1_u8; 60000];
     let buffer =
-        number_to_float::SequentialNumbers::<&[I24LE<3>], f32>::new_from_bytes(&data, 2, 10000)
+        number_to_float::SequentialNumbers::<&[I24_LE], f32>::new_from_bytes(&data, 2, 10000)
             .unwrap();
     c.bench_function("convert_i24le_to_float", |b| {
         b.iter(|| black_box(iter_with_i24le_float_conversion(black_box(&buffer))))

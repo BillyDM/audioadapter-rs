@@ -1,87 +1,147 @@
+#![allow(non_camel_case_types)]
+
 use num_traits::{Float, PrimInt};
 
 #[cfg(feature = "audio")]
 use audio_core::Sample;
 
-/// 24 bit signed integer, little endian. 24 bits stored packed as as 3 bytes or padded as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I24LE<const N: usize>([u8; N]);
-
-/// 24 bit signed integer, big endian. 24 bits stored packed as as 3 bytes or padded as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I24BE<const N: usize>([u8; N]);
-
-/// 24 bit unsigned integer, little endian. 24 bits stored packed as as 3 bytes or padded as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U24LE<const N: usize>([u8; N]);
-
-/// 24 bit unsigned integer, big endian. 24 bits stored packed as as 3 bytes or padded as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U24BE<const N: usize>([u8; N]);
-
-/// 32 bit signed integer, little endian. Stored as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I32LE([u8; 4]);
-
-/// 32 bit signed integer, big endian. Stored as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I32BE([u8; 4]);
-
-/// 64 bit signed integer, little endian. Stored as 8 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I64LE([u8; 8]);
-
-/// 64 bit signed integer, big endian. Stored as 8 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct I64BE([u8; 8]);
+// ------ 16-bit integer formats ------
 
 /// 16 bit signed integer, little endian. Stored as 2 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct I16LE([u8; 2]);
+pub struct I16_LE([u8; 2]);
 
 /// 16 bit signed integer, big endian. Stored as 2 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct I16BE([u8; 2]);
-
-/// 32 bit unsigned integer, little endian. Stored as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U32LE([u8; 4]);
-
-/// 32 bit unsigned integer, big endian. Stored as 4 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U32BE([u8; 4]);
-
-/// 64 bit unsigned integer, little endian. Stored as 8 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U64LE([u8; 8]);
-
-/// 64 bit unsigned integer, big endian. Stored as 8 bytes.
-#[derive(Debug, Clone, Copy)]
-pub struct U64BE([u8; 8]);
+pub struct I16_BE([u8; 2]);
 
 /// 16 bit unsigned integer, little endian. Stored as 2 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct U16LE([u8; 2]);
+pub struct U16_LE([u8; 2]);
 
 /// 16 bit unsigned integer, big endian. Stored as 2 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct U16BE([u8; 2]);
+pub struct U16_BE([u8; 2]);
+
+// ----- 24-bit formats -----
+
+/// 24 bit signed integer, little endian. Stored as 3 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_LE([u8; 3]);
+
+/// 24 bit signed integer, little endian. Stored as 4 bytes left justified.
+/// The 24 data bits are stored in the three most significant bytes,
+/// while the least significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_4LJ_LE([u8; 4]);
+
+/// 24 bit signed integer, little endian. Stored as 4 bytes right justified.
+/// The 24 data bits are stored in the three least significant bytes,
+/// while the most significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_4RJ_LE([u8; 4]);
+
+/// 24 bit signed integer, big endian. Stored as 3 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_BE([u8; 3]);
+
+/// 24 bit signed integer, big endian. Stored as 4 bytes left justified.
+/// The 24 data bits are stored in the three most significant bytes,
+/// while the least significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_4LJ_BE([u8; 4]);
+
+/// 24 bit signed integer, big endian. Stored as 4 bytes right justified.
+/// The 24 data bits are stored in the three least significant bytes,
+/// while the most significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct I24_4RJ_BE([u8; 4]);
+
+/// 24 bit unsigned integer, little endian. Stored as 3 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_LE([u8; 3]);
+
+/// 24 bit unsigned integer, little endian. Stored as 4 bytes left justified.
+/// The 24 data bits are stored in the three most significant bytes,
+/// while the least significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_4LJ_LE([u8; 4]);
+
+/// 24 bit unsigned integer, little endian. Stored as 4 bytes right justified.
+/// The 24 data bits are stored in the three least significant bytes,
+/// while the most significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_4RJ_LE([u8; 4]);
+
+/// 24 bit unsigned integer, big endian. Stored as 3 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_BE([u8; 3]);
+
+/// 24 bit unsigned integer, big endian. Stored as 4 bytes left justified.
+/// The 24 data bits are stored in the three most significant bytes,
+/// while the least significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_4LJ_BE([u8; 4]);
+
+/// 24 bit unsigned integer, big endian. Stored as 4 bytes right justified.
+/// The 24 data bits are stored in the three least significant bytes,
+/// while the most significant byte is unused padding.
+#[derive(Debug, Clone, Copy)]
+pub struct U24_4RJ_BE([u8; 4]);
+
+// ------ 32-bit integer formats ------
+
+/// 32 bit signed integer, little endian. Stored as 4 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I32_LE([u8; 4]);
+
+/// 32 bit signed integer, big endian. Stored as 4 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I32_BE([u8; 4]);
+
+/// 32 bit unsigned integer, little endian. Stored as 4 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U32_LE([u8; 4]);
+
+/// 32 bit unsigned integer, big endian. Stored as 4 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U32_BE([u8; 4]);
+
+// ----- 64-bit integer formats ------
+
+/// 64 bit signed integer, little endian. Stored as 8 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I64_LE([u8; 8]);
+
+/// 64 bit signed integer, big endian. Stored as 8 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct I64_BE([u8; 8]);
+
+/// 64 bit unsigned integer, little endian. Stored as 8 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U64_LE([u8; 8]);
+
+/// 64 bit unsigned integer, big endian. Stored as 8 bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct U64_BE([u8; 8]);
+
+// ----- floating point formats -----
 
 /// 32 bit floating point, little endian. Stored as 4 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct F32LE([u8; 4]);
+pub struct F32_LE([u8; 4]);
 
 /// 32 bit floating point, big endian. Stored as 4 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct F32BE([u8; 4]);
+pub struct F32_BE([u8; 4]);
 
 /// 64 bit floating point, little endian. Stored as 8 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct F64LE([u8; 8]);
+pub struct F64_LE([u8; 8]);
 
 /// 64 bit floating point, big endian. Stored as 8 bytes.
 #[derive(Debug, Clone, Copy)]
-pub struct F64BE([u8; 8]);
+pub struct F64_BE([u8; 8]);
 
 /// Convert a float to an integer, clamp at the min and max limits of the integer.
 fn to_clamped_int<T: Float, U: PrimInt>(value: T, converted: Option<U>) -> ConversionResult<U> {
@@ -241,8 +301,9 @@ rawsample_for_float!(f64, to_f64);
 // 24 bit formats, needs more work than others
 // because they don't map directly to a normal numerical type,
 
-/// 24 bit signed integer, little endian, stored as 4 bytes. The data is in the lower 3 bytes and the most significant byte is padding.
-impl BytesSample for I24LE<4> {
+/// 24 bit signed integer, little endian, stored as 4 bytes right justified.
+/// The data is in the lower 3 bytes and the most significant byte is padding.
+impl BytesSample for I24_4RJ_LE {
     type NumericType = i32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -269,8 +330,37 @@ impl BytesSample for I24LE<4> {
     }
 }
 
+/// 24 bit signed integer, little endian, stored as 4 bytes left justified.
+/// The data is in the upper 3 bytes and the least significant byte is padding.
+impl BytesSample for I24_4LJ_LE {
+    type NumericType = i32;
+    const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
+
+    fn from_slice(bytes: &[u8]) -> Self {
+        Self(bytes[0..4].try_into().unwrap())
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    fn as_mut_slice(&mut self) -> &mut [u8] {
+        &mut self.0
+    }
+
+    fn to_number(&self) -> Self::NumericType {
+        let padded = [0, self.0[1], self.0[2], self.0[3]];
+        i32::from_le_bytes(padded)
+    }
+
+    fn from_number(value: Self::NumericType) -> Self {
+        let bytes = value.to_le_bytes();
+        Self([0, bytes[1], bytes[2], bytes[3]])
+    }
+}
+
 /// 24 bit signed integer, little endian, stored as 3 bytes without padding.
-impl BytesSample for I24LE<3> {
+impl BytesSample for I24_LE {
     type NumericType = i32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -297,8 +387,9 @@ impl BytesSample for I24LE<3> {
     }
 }
 
-/// 24 bit signed integer, big endian, stored as 4 bytes. The data is in the lower 3 bytes and the most significant byte is padding.
-impl BytesSample for I24BE<4> {
+/// 24 bit signed integer, big endian, stored as 4 bytes right justified.
+/// The data is in the lower 3 bytes and the most significant byte is padding.
+impl BytesSample for I24_4RJ_BE {
     type NumericType = i32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -325,8 +416,37 @@ impl BytesSample for I24BE<4> {
     }
 }
 
+/// 24 bit signed integer, big endian, stored as 4 bytes left justified.
+/// The data is in the upper 3 bytes and the least significant byte is padding.
+impl BytesSample for I24_4LJ_BE {
+    type NumericType = i32;
+    const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
+
+    fn from_slice(bytes: &[u8]) -> Self {
+        Self(bytes[0..4].try_into().unwrap())
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    fn as_mut_slice(&mut self) -> &mut [u8] {
+        &mut self.0
+    }
+
+    fn to_number(&self) -> Self::NumericType {
+        let padded = [self.0[0], self.0[1], self.0[2], 0];
+        i32::from_be_bytes(padded)
+    }
+
+    fn from_number(value: Self::NumericType) -> Self {
+        let bytes = value.to_be_bytes();
+        Self([bytes[0], bytes[1], bytes[2], 0])
+    }
+}
+
 /// 24 bit signed integer, big endian, stored as 3 bytes without padding.
-impl BytesSample for I24BE<3> {
+impl BytesSample for I24_BE {
     type NumericType = i32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -353,8 +473,9 @@ impl BytesSample for I24BE<3> {
     }
 }
 
-/// 24 bit unsigned integer, little endian, stored as 4 bytes. The data is in the lower 3 bytes and the most significant byte is padding.
-impl BytesSample for U24LE<4> {
+/// 24 bit unsigned integer, little endian, stored as 4 bytes right justified.
+/// The data is in the lower 3 bytes and the most significant byte is padding.
+impl BytesSample for U24_4RJ_LE {
     type NumericType = u32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -381,8 +502,37 @@ impl BytesSample for U24LE<4> {
     }
 }
 
+/// 24 bit unsigned integer, little endian, stored as 4 bytes left justified.
+/// The data is in the upper 3 bytes and the least significant byte is padding.
+impl BytesSample for U24_4LJ_LE {
+    type NumericType = u32;
+    const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
+
+    fn from_slice(bytes: &[u8]) -> Self {
+        Self(bytes[0..4].try_into().unwrap())
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    fn as_mut_slice(&mut self) -> &mut [u8] {
+        &mut self.0
+    }
+
+    fn to_number(&self) -> Self::NumericType {
+        let padded = [0, self.0[1], self.0[2], self.0[3]];
+        u32::from_le_bytes(padded)
+    }
+
+    fn from_number(value: Self::NumericType) -> Self {
+        let bytes = value.to_le_bytes();
+        Self([0, bytes[1], bytes[2], bytes[3]])
+    }
+}
+
 /// 24 bit unsigned integer, little endian, stored as 3 bytes without padding.
-impl BytesSample for U24LE<3> {
+impl BytesSample for U24_LE {
     type NumericType = u32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -409,8 +559,9 @@ impl BytesSample for U24LE<3> {
     }
 }
 
-/// 24 bit unsigned integer, big endian, stored as 4 bytes. The data is in the lower 3 bytes and the most significant byte is padding.
-impl BytesSample for U24BE<4> {
+/// 24 bit unsigned integer, big endian, stored as 4 bytes right justified.
+/// The data is in the lower 3 bytes and the most significant byte is padding.
+impl BytesSample for U24_4RJ_BE {
     type NumericType = u32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -437,8 +588,37 @@ impl BytesSample for U24BE<4> {
     }
 }
 
+/// 24 bit unsigned integer, big endian, stored as 4 bytes left justified.
+/// The data is in the upper 3 bytes and the least significant byte is padding.
+impl BytesSample for U24_4LJ_BE {
+    type NumericType = u32;
+    const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
+
+    fn from_slice(bytes: &[u8]) -> Self {
+        Self(bytes[0..4].try_into().unwrap())
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    fn as_mut_slice(&mut self) -> &mut [u8] {
+        &mut self.0
+    }
+
+    fn to_number(&self) -> Self::NumericType {
+        let padded = [self.0[0], self.0[1], self.0[2], 0];
+        u32::from_be_bytes(padded)
+    }
+
+    fn from_number(value: Self::NumericType) -> Self {
+        let bytes = value.to_be_bytes();
+        Self([bytes[0], bytes[1], bytes[2], 0])
+    }
+}
+
 /// 24 bit unsigned integer, big endian, stored as 3 bytes without padding.
-impl BytesSample for U24BE<3> {
+impl BytesSample for U24_BE {
     type NumericType = u32;
     const BYTES_PER_SAMPLE: usize = core::mem::size_of::<Self>();
 
@@ -494,25 +674,25 @@ macro_rules! bytessample_for_newtype {
     };
 }
 
-bytessample_for_newtype!(i64, I64LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(u64, U64LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(i64, I64BE, from_be_bytes, to_be_bytes);
-bytessample_for_newtype!(u64, U64BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(i64, I64_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(u64, U64_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(i64, I64_BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(u64, U64_BE, from_be_bytes, to_be_bytes);
 
-bytessample_for_newtype!(i16, I16LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(u16, U16LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(i16, I16BE, from_be_bytes, to_be_bytes);
-bytessample_for_newtype!(u16, U16BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(i16, I16_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(u16, U16_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(i16, I16_BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(u16, U16_BE, from_be_bytes, to_be_bytes);
 
-bytessample_for_newtype!(i32, I32LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(u32, U32LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(i32, I32BE, from_be_bytes, to_be_bytes);
-bytessample_for_newtype!(u32, U32BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(i32, I32_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(u32, U32_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(i32, I32_BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(u32, U32_BE, from_be_bytes, to_be_bytes);
 
-bytessample_for_newtype!(f32, F32LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(f32, F32BE, from_be_bytes, to_be_bytes);
-bytessample_for_newtype!(f64, F64LE, from_le_bytes, to_le_bytes);
-bytessample_for_newtype!(f64, F64BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(f32, F32_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(f32, F32_BE, from_be_bytes, to_be_bytes);
+bytessample_for_newtype!(f64, F64_LE, from_le_bytes, to_le_bytes);
+bytessample_for_newtype!(f64, F64_BE, from_be_bytes, to_be_bytes);
 
 impl<V> RawSample for V
 where
@@ -544,62 +724,61 @@ macro_rules! impl_sample_for_newtype {
 }
 
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I64LE, 8);
+impl_sample_for_newtype!(I16_LE, 2);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U64LE, 8);
+impl_sample_for_newtype!(U16_LE, 2);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I64BE, 8);
+impl_sample_for_newtype!(I16_BE, 2);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U64BE, 8);
+impl_sample_for_newtype!(U16_BE, 2);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I16LE, 2);
+impl_sample_for_newtype!(I24_LE, 3);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U16LE, 2);
+impl_sample_for_newtype!(I24_4LJ_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I16BE, 2);
+impl_sample_for_newtype!(I24_4RJ_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U16BE, 2);
+impl_sample_for_newtype!(U24_LE, 3);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I32LE, 4);
+impl_sample_for_newtype!(U24_4LJ_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U32LE, 4);
+impl_sample_for_newtype!(U24_4RJ_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(I32BE, 4);
+impl_sample_for_newtype!(I24_BE, 3);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(U32BE, 4);
+impl_sample_for_newtype!(I24_4LJ_BE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(F32LE, 4);
+impl_sample_for_newtype!(I24_4RJ_BE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(F32BE, 4);
+impl_sample_for_newtype!(U24_BE, 3);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(F64LE, 8);
+impl_sample_for_newtype!(U24_4LJ_BE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_newtype!(F64BE, 8);
-
+impl_sample_for_newtype!(U24_4RJ_BE, 4);
 #[cfg(feature = "audio")]
-macro_rules! impl_sample_for_generic_newtype {
-    ($newtype:ident, $bytes:expr) => {
-        unsafe impl Sample for $newtype<$bytes> {
-            const ZERO: $newtype<$bytes> = $newtype([0; $bytes]);
-        }
-    };
-}
+impl_sample_for_newtype!(I32_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(I24BE, 3);
+impl_sample_for_newtype!(U32_LE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(I24LE, 3);
+impl_sample_for_newtype!(I32_BE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(U24BE, 3);
+impl_sample_for_newtype!(U32_BE, 4);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(U24LE, 3);
+impl_sample_for_newtype!(I64_LE, 8);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(I24BE, 4);
+impl_sample_for_newtype!(U64_LE, 8);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(I24LE, 4);
+impl_sample_for_newtype!(I64_BE, 8);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(U24BE, 4);
+impl_sample_for_newtype!(U64_BE, 8);
 #[cfg(feature = "audio")]
-impl_sample_for_generic_newtype!(U24LE, 4);
+impl_sample_for_newtype!(F32_LE, 4);
+#[cfg(feature = "audio")]
+impl_sample_for_newtype!(F32_BE, 4);
+#[cfg(feature = "audio")]
+impl_sample_for_newtype!(F64_LE, 8);
+#[cfg(feature = "audio")]
+impl_sample_for_newtype!(F64_BE, 8);
 
 #[cfg(test)]
 mod tests {
@@ -814,28 +993,28 @@ mod tests {
         };
     }
 
-    test_simple_int_bytes!(convert_i16_from_I16LE, i16, I16LE, to_le_bytes);
-    test_simple_int_bytes!(convert_i16_from_I16BE, i16, I16BE, to_be_bytes);
-    test_simple_int_bytes!(convert_i32_from_I32LE, i32, I32LE, to_le_bytes);
-    test_simple_int_bytes!(convert_i32_from_I32BE, i32, I32BE, to_be_bytes);
-    test_simple_int_bytes!(convert_i64_from_I64LE, i64, I64LE, to_le_bytes);
-    test_simple_int_bytes!(convert_i64_from_I64BE, i64, I64BE, to_be_bytes);
+    test_simple_int_bytes!(convert_i16_from_I16_LE, i16, I16_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_i16_from_I16_BE, i16, I16_BE, to_be_bytes);
+    test_simple_int_bytes!(convert_i32_from_I32_LE, i32, I32_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_i32_from_I32_BE, i32, I32_BE, to_be_bytes);
+    test_simple_int_bytes!(convert_i64_from_I64_LE, i64, I64_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_i64_from_I64_BE, i64, I64_BE, to_be_bytes);
 
-    test_simple_int_bytes!(convert_u16_from_U16LE, u16, U16LE, to_le_bytes);
-    test_simple_int_bytes!(convert_u16_from_U16BE, u16, U16BE, to_be_bytes);
-    test_simple_int_bytes!(convert_u32_from_U32LE, u32, U32LE, to_le_bytes);
-    test_simple_int_bytes!(convert_u32_from_U32BE, u32, U32BE, to_be_bytes);
-    test_simple_int_bytes!(convert_u64_from_U64LE, u64, U64LE, to_le_bytes);
-    test_simple_int_bytes!(convert_u64_from_U64BE, u64, U64BE, to_be_bytes);
+    test_simple_int_bytes!(convert_u16_from_U16_LE, u16, U16_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_u16_from_U16_BE, u16, U16_BE, to_be_bytes);
+    test_simple_int_bytes!(convert_u32_from_U32_LE, u32, U32_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_u32_from_U32_BE, u32, U32_BE, to_be_bytes);
+    test_simple_int_bytes!(convert_u64_from_U64_LE, u64, U64_LE, to_le_bytes);
+    test_simple_int_bytes!(convert_u64_from_U64_BE, u64, U64_BE, to_be_bytes);
 
-    test_float_bytes!(convert_f32_fom_F32LE, f32, F32LE, to_le_bytes);
-    test_float_bytes!(convert_f32_fom_F32BE, f32, F32BE, to_be_bytes);
-    test_float_bytes!(convert_f64_fom_F64LE, f64, F64LE, to_le_bytes);
-    test_float_bytes!(convert_f64_fom_F64BE, f64, F64BE, to_be_bytes);
+    test_float_bytes!(convert_f32_fom_F32_LE, f32, F32_LE, to_le_bytes);
+    test_float_bytes!(convert_f32_fom_F32_BE, f32, F32_BE, to_be_bytes);
+    test_float_bytes!(convert_f64_fom_F64_LE, f64, F64_LE, to_le_bytes);
+    test_float_bytes!(convert_f64_fom_F64_BE, f64, F64_BE, to_be_bytes);
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_I24LE_3bytes() {
+    fn test_I24_LE() {
         let number = i32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -847,13 +1026,13 @@ mod tests {
         // Drop the LSB!
         let bytes = [allbytes[1], allbytes[2], allbytes[3]];
 
-        let wrapped = I24LE(bytes);
+        let wrapped = I24_LE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_I24BE_3bytes() {
+    fn test_I24_BE() {
         let number = i32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -865,13 +1044,13 @@ mod tests {
         // Drop the LSB!
         let bytes = [allbytes[0], allbytes[1], allbytes[2]];
 
-        let wrapped = I24BE(bytes);
+        let wrapped = I24_BE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_I24LE_4bytes() {
+    fn test_I24_4RJ_LE() {
         let number = i32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -883,13 +1062,13 @@ mod tests {
         // Drop the LSB and insert padding at MSB!
         let bytes = [allbytes[1], allbytes[2], allbytes[3], 0];
 
-        let wrapped = I24LE(bytes);
+        let wrapped = I24_4RJ_LE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_I24BE_4bytes() {
+    fn test_I24_4RJ_BE() {
         let number = i32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -901,13 +1080,49 @@ mod tests {
         // Drop the LSB and insert padding at MSB!
         let bytes = [0, allbytes[0], allbytes[1], allbytes[2]];
 
-        let wrapped = I24BE(bytes);
+        let wrapped = I24_4RJ_BE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_U24LE_3bytes() {
+    fn test_I24_4LJ_LE() {
+        let number = i32::MAX / 5 * 4;
+
+        // make sure LSB is zero
+        let number = number >> 8;
+        let number = number << 8;
+
+        let allbytes = number.to_le_bytes();
+        // Little-endian stores the LSB at the smallest address.
+        // Put a zero at LSB and keep the rest unchanged.
+        let bytes = [0, allbytes[1], allbytes[2], allbytes[3]];
+
+        let wrapped = I24_4LJ_LE(bytes);
+        assert_eq!(number, wrapped.to_number());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_I24_4LJ_BE() {
+        let number = i32::MAX / 5 * 4;
+
+        // make sure LSB is zero
+        let number = number >> 8;
+        let number = number << 8;
+
+        let allbytes = number.to_be_bytes();
+        // Big-endian stores the LSB at the largest address.
+        // Put a zero at LSB and keep the rest unchanged.
+        let bytes = [allbytes[0], allbytes[1], allbytes[2], 0];
+
+        let wrapped = I24_4LJ_BE(bytes);
+        assert_eq!(number, wrapped.to_number());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_U24_LE() {
         let number = u32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -919,13 +1134,13 @@ mod tests {
         // Drop the LSB!
         let bytes = [allbytes[1], allbytes[2], allbytes[3]];
 
-        let wrapped = U24LE(bytes);
+        let wrapped = U24_LE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_U24BE_3bytes() {
+    fn test_U24_BE() {
         let number = u32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -937,13 +1152,13 @@ mod tests {
         // Drop the LSB!
         let bytes = [allbytes[0], allbytes[1], allbytes[2]];
 
-        let wrapped = U24BE(bytes);
+        let wrapped = U24_BE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_U24LE_4bytes() {
+    fn test_U24_4RJ_LE() {
         let number = u32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -955,13 +1170,13 @@ mod tests {
         // Drop the LSB and insert padding at MSB!
         let bytes = [allbytes[1], allbytes[2], allbytes[3], 0];
 
-        let wrapped = U24LE(bytes);
+        let wrapped = U24_4RJ_LE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_U24BE_4bytes() {
+    fn test_U24_4RJ_BE() {
         let number = u32::MAX / 5 * 4;
 
         // make sure LSB is zero
@@ -973,7 +1188,43 @@ mod tests {
         // Drop the LSB and insert padding at MSB!
         let bytes = [0, allbytes[0], allbytes[1], allbytes[2]];
 
-        let wrapped = U24BE(bytes);
+        let wrapped = U24_4RJ_BE(bytes);
+        assert_eq!(number, wrapped.to_number());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_U24_4LJ_LE() {
+        let number = u32::MAX / 5 * 4;
+
+        // make sure LSB is zero
+        let number = number >> 8;
+        let number = number << 8;
+
+        let allbytes = number.to_le_bytes();
+        // Little-endian stores the LSB at the smallest address.
+        // Put a zero at LSB and keep the rest unchanged.
+        let bytes = [0, allbytes[1], allbytes[2], allbytes[3]];
+
+        let wrapped = U24_4LJ_LE(bytes);
+        assert_eq!(number, wrapped.to_number());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_U24_4LJ_BE() {
+        let number = u32::MAX / 5 * 4;
+
+        // make sure LSB is zero
+        let number = number >> 8;
+        let number = number << 8;
+
+        let allbytes = number.to_be_bytes();
+        // Big-endian stores the LSB at the largest address.
+        // Put a zero at LSB and keep the rest unchanged.
+        let bytes = [allbytes[0], allbytes[1], allbytes[2], 0];
+
+        let wrapped = U24_4LJ_BE(bytes);
         assert_eq!(number, wrapped.to_number());
     }
 }

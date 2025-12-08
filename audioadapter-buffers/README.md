@@ -55,7 +55,7 @@ while converting them to f32:
 ```rust
 use audioadapter_buffers::number_to_float::InterleavedNumbers;
 use audioadapter::Adapter;
-use audioadapter_sample::sample::I24LE;
+use audioadapter_sample::sample::I24_LE;
 
 // make a vector with some dummy data.
 // 2 channels * 3 frames * 3 bytes per sample => 18 bytes
@@ -69,7 +69,7 @@ let data: Vec<u8> = vec![
 ];
 
 // wrap the data
-let buffer = InterleavedNumbers::<&[I24LE<3>], f32>::new_from_bytes(&data, 2, 3).unwrap();
+let buffer = InterleavedNumbers::<&[I24_LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
 
 // Loop over all samples and print their values
 for channel in 0..buffer.channels() {
@@ -83,10 +83,10 @@ for channel in 0..buffer.channels() {
 }
 ```
 
-Note that the example uses `I24LE<3>`, which means 24-bit samples
+Note that the example uses `I24_LE`, which means 24-bit samples
 stored as 3 bytes in little-endian order without padding.
 24-bit samples are also commonly stored with a padding byte, so that each sample takes up four bytes.
-This is handled by selecting `I24LE<4>` as the format.
+This is handled by selecting `I24_4RJ_LE` or `I24_4LJ_LE` as the format.
 
 ## Use without the standard library
 This crate can be used in `no_std` environments if the `std` Cargo feature is disabled.

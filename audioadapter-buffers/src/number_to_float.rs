@@ -40,14 +40,14 @@
 //! ```
 //! use audioadapter_buffers::number_to_float::InterleavedNumbers;
 //! use audioadapter::Adapter;
-//! use audioadapter_sample::sample::I16LE;
+//! use audioadapter_sample::sample::I16_LE;
 //!
 //! // make a vector with some dummy data.
 //! // 2 channels * 3 frames * 2 bytes per sample => 12 bytes
 //! let data: Vec<u8> = vec![0, 0, 0, 128, 0, 64, 0, 192, 0, 32, 0, 224];
 //!
 //! // wrap the data
-//! let buffer = InterleavedNumbers::<&[I16LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
+//! let buffer = InterleavedNumbers::<&[I16_LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
 //!
 //! // Loop over all samples and print their values
 //! for channel in 0..2 {
@@ -382,6 +382,46 @@ macro_rules! impl_traits_newtype {
             ) -> Option<usize> {
                 self.copy_frames_within_impl(src, dest, count)
             }
+
+            fn copy_sample_within(
+                &mut self,
+                source_channel: usize,
+                source_frame: usize,
+                target_channel: usize,
+                target_frame: usize,
+            ) -> bool {
+                if source_channel >= self.channels
+                    || source_frame >= self.frames
+                    || target_channel >= self.channels
+                    || target_frame >= self.frames
+                {
+                    return false;
+                }
+                let source_index = self.calc_index(source_channel, source_frame);
+                let target_index = self.calc_index(target_channel, target_frame);
+                self.buf[target_index] = self.buf[source_index].clone();
+                true
+            }
+
+            fn swap_samples(
+                &mut self,
+                channel_a: usize,
+                frame_a: usize,
+                channel_b: usize,
+                frame_b: usize,
+            ) -> bool {
+                if channel_a >= self.channels
+                    || frame_a >= self.frames
+                    || channel_b >= self.channels
+                    || frame_b >= self.frames
+                {
+                    return false;
+                }
+                let index_a = self.calc_index(channel_a, frame_a);
+                let index_b = self.calc_index(channel_b, frame_b);
+                self.buf.swap(index_a, index_b);
+                true
+            }
         }
     };
 }
@@ -398,7 +438,7 @@ impl_traits_newtype!(SequentialNumbers);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use audioadapter_sample::sample::{I16LE, I24LE};
+    use audioadapter_sample::sample::{I16_LE, I24_LE};
 
     #[test]
     fn read_i32() {
@@ -527,7 +567,7 @@ mod tests {
     #[test]
     fn read_i16_bytes_interleaved() {
         let data: [u8; 12] = [0, 0, 0, 128, 0, 64, 0, 192, 0, 32, 0, 224];
-        let buffer = InterleavedNumbers::<&[I16LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
+        let buffer = InterleavedNumbers::<&[I16_LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
         assert_eq!(buffer.read_sample(0, 0).unwrap(), 0.0);
         assert_eq!(buffer.read_sample(1, 0).unwrap(), -1.0);
         assert_eq!(buffer.read_sample(0, 1).unwrap(), 0.5);
@@ -541,7 +581,7 @@ mod tests {
         let expected: [u8; 12] = [0, 0, 0, 128, 0, 64, 0, 192, 0, 32, 0, 224];
         let mut data = [0; 12];
         let mut buffer =
-            InterleavedNumbers::<&mut [I16LE], f32>::new_from_bytes_mut(&mut data, 2, 3).unwrap();
+            InterleavedNumbers::<&mut [I16_LE], f32>::new_from_bytes_mut(&mut data, 2, 3).unwrap();
         buffer.write_sample(0, 0, &0.0).unwrap();
         buffer.write_sample(1, 0, &-1.0).unwrap();
         buffer.write_sample(0, 1, &0.5).unwrap();
@@ -554,7 +594,7 @@ mod tests {
     #[test]
     fn read_i24_bytes_interleaved() {
         let data: [u8; 18] = [0, 0, 0, 0, 0, 128, 0, 0, 64, 0, 0, 192, 0, 0, 32, 0, 0, 224];
-        let buffer = InterleavedNumbers::<&[I24LE<3>], f32>::new_from_bytes(&data, 2, 3).unwrap();
+        let buffer = InterleavedNumbers::<&[I24_LE], f32>::new_from_bytes(&data, 2, 3).unwrap();
         assert_eq!(buffer.read_sample(0, 0).unwrap(), 0.0);
         assert_eq!(buffer.read_sample(1, 0).unwrap(), -1.0);
         assert_eq!(buffer.read_sample(0, 1).unwrap(), 0.5);

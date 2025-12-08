@@ -39,23 +39,49 @@ The main functionality of this crate is provided by two main traits:
 In addition to the traits, it also defines a number of wrappers for bytes.
 For example, four bytes might be a signed or unsigned 32-bit integer, a 32-bit float, or
 a 24-bit integer with a padding byte.
-By using the appropriate wrapper, for example [sample::I32LE], it becomes clear that
+By using the appropriate wrapper, for example [sample::I32_LE], it becomes clear that
 these bytes store a signed 32-bit integer in little-endian byte order.
 
-## Integer formats with different bit depths
-Some integer sample formats match a standard integer type such as [i16] or [i32].
-However there is no direct match for 24-bit samples.
-24-bit samples are also commonly stored in two different ways:
-as either 3 bytes per sample, or 4 bytes per sample (with an extra byte of padding).
+## Special note on 24-bit audio formats
 
-This crate provides ways to convert between all the common integer sample formats
-and the standard integer types.
-For 24-bit samples, the next larger type, [i32] or [u32], is used,
-such that the conversion can be done without loss of precision.
+While 16-bit (`i16`) and 32-bit (`i32`) audio samples align with standard integer types,
+24-bit samples do not have a direct native equivalent.
+
+To preserve full precision when working with 24-bit data,
+this crate uses the next larger integer type, `i32` or `u32`, for conversions.
+
+
+### Storage formats for 24-bit samples
+
+24-bit audio samples are typically stored in one of two formats:
+
+- **Packed**: Each sample uses exactly 3 bytes.
+- **Padded**: An additional byte is added, making each sample 4 bytes.
+
+#### Packed format
+
+Packed samples are space-efficient, using only the necessary 3 bytes per sample.
+Since all bytes contain data, there's no ambiguity about byte placement.
+However, the 3-byte alignment can be inconvenient to work with,
+and certain hardware may not support it.
+
+#### Padded format
+
+Padded samples align to 4 bytes, which simplifies memory access
+and may be required by some devices or APIs.
+The padding byte can be placed in two ways:
+
+- **Left-justified**: Padding is added as the least significant byte,
+  so the actual data occupies the three most significant bytes.
+  - Used in `.wav` files and the Windows Wasapi API.
+
+- **Right-justified**: Padding is added as the most significant byte,
+  placing the data in the three least significant bytes.
+  - Used in the ALSA API on Linux, such as the `SND_PCM_FORMAT_S24_LE` format.
 
 ### Example: read 24-bit integers from raw bytes
 ```rust
-use audioadapter_sample::sample::I24LE;
+use audioadapter_sample::sample::I24_LE;
 use audioadapter_sample::sample::BytesSample;
 
 // Make a vector with some dummy data.
@@ -63,7 +89,7 @@ use audioadapter_sample::sample::BytesSample;
 let bytes = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 for sample in bytes.chunks_exact(3) {
-  let new_value: i32 = I24LE::<3>::from_slice(sample).to_number();
+  let new_value: i32 = I24_LE::from_slice(sample).to_number();
   println!("{}", new_value);
 }
 ```
@@ -100,7 +126,7 @@ for sample in indata.iter() {
 
 ### Example, converting 16-bit integers from raw bytes to [f32]
 ```rust
-use audioadapter_sample::sample::I16LE;
+use audioadapter_sample::sample::I16_LE;
 use audioadapter_sample::sample::BytesSample;
 use audioadapter_sample::sample::RawSample;
 
@@ -109,7 +135,7 @@ use audioadapter_sample::sample::RawSample;
 let bytes = vec![1, 2, 3, 4, 5, 6];
 
 for sample in bytes.chunks_exact(2) {
-  let new_value: f32 = I16LE::from_slice(sample).to_scaled_float();
+  let new_value: f32 = I16_LE::from_slice(sample).to_scaled_float();
   println!("{}", new_value);
 }
 ```
@@ -126,7 +152,7 @@ Example
 ```rust
 # #[cfg(feature = "std")]
 # {
-use audioadapter_sample::sample::I16LE;
+use audioadapter_sample::sample::I16_LE;
 use audioadapter_sample::readwrite::ReadSamples;
 
 // make a vector with some dummy data.
@@ -134,7 +160,7 @@ let data: Vec<u8> = vec![1, 2, 3, 4];
 // slices implement Read.
 let mut slice = &data[..];
 // read the first value as 16 bit integer, convert to f32.
-let float_value = slice.read_converted::<I16LE, f32>();
+let float_value = slice.read_converted::<I16_LE, f32>();
 # }
 ```
 

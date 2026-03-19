@@ -211,7 +211,9 @@ where
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
     use crate::tests::MinimalAdapter;
+    use alloc::vec;
 
     use super::*;
 

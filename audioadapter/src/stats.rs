@@ -116,8 +116,11 @@ where
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
+
     use crate::stats::AdapterStats;
     use crate::tests::MinimalAdapter;
+    use alloc::vec;
 
     #[test]
     fn stats_integer() {

@@ -386,8 +386,11 @@ where
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
+
     use crate::tests::MinimalAdapter;
     use crate::{Adapter, AdapterMut};
+    use alloc::vec;
 
     fn dummy_adapter() -> MinimalAdapter<i32> {
         let data = vec![1_i32, 1, 2, 3, 4, 5, 6, 7];

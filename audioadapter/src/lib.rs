@@ -1,5 +1,5 @@
 #![doc = include_str!("../README.md")]
-#![cfg_attr(all(not(feature = "test-utils"), not(test)), no_std)]
+#![no_std]
 
 /// The traits for accessing samples in buffers.
 mod traits;
@@ -18,7 +18,11 @@ pub mod audio;
 
 #[cfg(any(test, feature = "test-utils"))]
 pub mod tests {
+    extern crate alloc;
+
     use crate::{Adapter, AdapterMut};
+    use alloc::vec;
+    use alloc::vec::Vec;
     use num_traits::Float;
 
     /// Minimal implementation of an Adapter based on a vec
@@ -83,7 +87,7 @@ pub mod tests {
     /// The sample type `T` must support `Default`, `Clone`, `PartialEq`, `Debug`, and be convertible to and from `usize`.
     pub fn test_adapter_mut_methods<'a, T>(buffer: &mut dyn AdapterMut<'a, T>)
     where
-        T: Default + Clone + PartialEq + std::fmt::Debug + From<usize> + Into<usize> + 'a,
+        T: Default + Clone + PartialEq + core::fmt::Debug + From<usize> + Into<usize> + 'a,
     {
         // Ensure buffer is large enough for tests
         assert!(
@@ -196,7 +200,7 @@ pub mod tests {
     /// The sample type `T` must be a float that supports `Default`, `Clone`, `PartialEq`, and `Debug`.
     pub fn test_float_adapter_mut_methods<'a, T>(buffer: &mut dyn AdapterMut<'a, T>)
     where
-        T: Float + Default + Clone + PartialEq + std::fmt::Debug + 'a,
+        T: Float + Default + Clone + PartialEq + core::fmt::Debug + 'a,
     {
         // Helper for approximate float comparison
         let assert_approx_eq = |a: T, b: T, message: &str| {
@@ -213,7 +217,7 @@ pub mod tests {
         let assert_slice_approx_eq = |a: &[T], b: &[T], message: &str| {
             assert_eq!(a.len(), b.len(), "{} (slice lengths differ)", message);
             for (i, (val_a, val_b)) in a.iter().zip(b.iter()).enumerate() {
-                let msg = format!("{} (element {})", message, i);
+                let msg = alloc::format!("{} (element {})", message, i);
                 assert_approx_eq(*val_a, *val_b, &msg);
             }
         };

@@ -1,6 +1,6 @@
 [package]
 name = "audioadapter"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2021"
 rust-version = "1.74"
 authors = ["HEnquist <henrik.enquist@gmail.com>"]
@@ -16,10 +16,10 @@ default = ["audio"]
 audio = ["audio-core"]
 test-utils = []
 
-
 [dependencies]
-num-traits = "0.2.15"
-audio-core = { version = "0.2.0", optional = true }
+num-traits = { version = "0.2.15", default-features = false }
+audio-core = { version = "0.2.0", default-features = false, optional = true }
+
 
 [dev-dependencies]
 audio = "0.2.0"

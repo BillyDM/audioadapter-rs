@@ -18,14 +18,14 @@ where
             return 0.0;
         }
         for frame in 0..self.frames() {
-            square_sum += self
+            let sample = self
                 .read_sample(channel, frame)
                 .unwrap_or(T::zero())
                 .to_f64()
-                .unwrap_or_default()
-                .powi(2);
+                .unwrap_or_default();
+            square_sum += sample * sample;
         }
-        (square_sum / self.frames() as f64).sqrt()
+        libm::sqrt(square_sum / self.frames() as f64)
     }
 
     /// Calculate the RMS value of the given channel.
@@ -36,14 +36,14 @@ where
             return 0.0;
         }
         for channel in 0..self.channels() {
-            square_sum += self
+            let sample = self
                 .read_sample(channel, frame)
                 .unwrap_or(T::zero())
                 .to_f64()
-                .unwrap_or_default()
-                .powi(2);
+                .unwrap_or_default();
+            square_sum += sample * sample;
         }
-        (square_sum / self.frames() as f64).sqrt()
+        libm::sqrt(square_sum / self.channels() as f64)
     }
 
     /// Calculate the peak-to-peak value of the given channel.
@@ -138,5 +138,23 @@ mod tests {
         assert_eq!(buffer.channel_rms(0), 1.0);
         assert_eq!(buffer.channel_min_and_max(0), (-1.0, 1.0));
         assert_eq!(buffer.channel_peak_to_peak(0), 2.0);
+    }
+
+    #[test]
+    fn stats_frame_integer() {
+        let data = vec![-1_i32, 1, -1, 1, -1, 1, -1, 1];
+        let buffer = MinimalAdapter::new_from_vec(data, 2, 4);
+        assert_eq!(buffer.frame_rms(0), 1.0);
+        assert_eq!(buffer.frame_min_and_max(0), (-1, 1));
+        assert_eq!(buffer.frame_peak_to_peak(0), 2.0);
+    }
+
+    #[test]
+    fn stats_frame_float() {
+        let data = vec![-1.0_f32, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0];
+        let buffer = MinimalAdapter::new_from_vec(data, 2, 4);
+        assert_eq!(buffer.frame_rms(0), 1.0);
+        assert_eq!(buffer.frame_min_and_max(0), (-1.0, 1.0));
+        assert_eq!(buffer.frame_peak_to_peak(0), 2.0);
     }
 }

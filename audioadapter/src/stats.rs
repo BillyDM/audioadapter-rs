@@ -1,5 +1,10 @@
 use num_traits::{Num, ToPrimitive};
 
+// Rust analyzer itself always the standard library enabled,
+// which causes it to think this trait is not used.
+#[allow(unused)]
+use num_traits::Float;
+
 use crate::Adapter;
 
 /// A trait providing methods to calculate the RMS and peak-to-peak values of a channel or frame.
@@ -25,7 +30,7 @@ where
                 .unwrap_or_default();
             square_sum += sample * sample;
         }
-        libm::sqrt(square_sum / self.frames() as f64)
+        (square_sum / self.frames() as f64).sqrt()
     }
 
     /// Calculate the RMS value of the given channel.
@@ -43,7 +48,7 @@ where
                 .unwrap_or_default();
             square_sum += sample * sample;
         }
-        libm::sqrt(square_sum / self.channels() as f64)
+        (square_sum / self.channels() as f64).sqrt()
     }
 
     /// Calculate the peak-to-peak value of the given channel.

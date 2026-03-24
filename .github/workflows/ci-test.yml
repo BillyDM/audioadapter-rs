@@ -25,7 +25,7 @@ jobs:
         run: cargo test
 
       - name: Run audioadapter no-default-features tests
-        run: cargo test -p audioadapter --no-default-features
+        run: cargo test -p audioadapter --no-default-features --features "libm"
 
   lints:
     name: Lints

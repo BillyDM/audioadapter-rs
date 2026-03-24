@@ -197,7 +197,7 @@ pub mod tests {
     ///
     /// It takes a mutable reference to an adapter and runs a series of tests.
     /// The adapter is expected to have at least 2 channels and 4 frames.
-    /// The sample type `T` must be a float that supports `Default`, `Clone`, `PartialEq`, and `Debug`.
+    /// The sample type `T` must be a floating-point type implementing `FloatCore`, `NumCast`, `Default`, `Clone`, `PartialEq`, and `Debug`.
     pub fn test_float_adapter_mut_methods<'a, T>(buffer: &mut dyn AdapterMut<'a, T>)
     where
         T: FloatCore + NumCast + Default + Clone + PartialEq + core::fmt::Debug + 'a,

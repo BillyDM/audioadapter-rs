@@ -1,6 +1,6 @@
 use num_traits::{Num, ToPrimitive};
 
-// Rust analyzer itself always the standard library enabled,
+// Rust analyzer itself always has the standard library enabled,
 // which causes it to think this trait is not used.
 #[allow(unused)]
 use num_traits::Float;

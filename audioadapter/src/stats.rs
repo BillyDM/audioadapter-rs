@@ -18,14 +18,14 @@ where
             return 0.0;
         }
         for frame in 0..self.frames() {
-            square_sum += self
+            let sample = self
                 .read_sample(channel, frame)
                 .unwrap_or(T::zero())
                 .to_f64()
-                .unwrap_or_default()
-                .powi(2);
+                .unwrap_or_default();
+            square_sum += sample * sample;
         }
-        (square_sum / self.frames() as f64).sqrt()
+        libm::sqrt(square_sum / self.frames() as f64)
     }
 
     /// Calculate the RMS value of the given channel.
@@ -36,14 +36,14 @@ where
             return 0.0;
         }
         for channel in 0..self.channels() {
-            square_sum += self
+            let sample = self
                 .read_sample(channel, frame)
                 .unwrap_or(T::zero())
                 .to_f64()
-                .unwrap_or_default()
-                .powi(2);
+                .unwrap_or_default();
+            square_sum += sample * sample;
         }
-        (square_sum / self.frames() as f64).sqrt()
+        libm::sqrt(square_sum / self.frames() as f64)
     }
 
     /// Calculate the peak-to-peak value of the given channel.

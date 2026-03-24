@@ -18,6 +18,7 @@ test-utils = []
 
 [dependencies]
 num-traits = { version = "0.2.15", default-features = false }
+libm = "0.2"
 audio-core = { version = "0.2.0", default-features = false, optional = true }
 
 

@@ -23,7 +23,7 @@ pub mod tests {
     use crate::{Adapter, AdapterMut};
     use alloc::vec;
     use alloc::vec::Vec;
-    use num_traits::Float;
+    use num_traits::{float::FloatCore, NumCast};
 
     /// Minimal implementation of an Adapter based on a vec
     /// intended for testing purposes.
@@ -200,11 +200,11 @@ pub mod tests {
     /// The sample type `T` must be a float that supports `Default`, `Clone`, `PartialEq`, and `Debug`.
     pub fn test_float_adapter_mut_methods<'a, T>(buffer: &mut dyn AdapterMut<'a, T>)
     where
-        T: Float + Default + Clone + PartialEq + core::fmt::Debug + 'a,
+        T: FloatCore + NumCast + Default + Clone + PartialEq + core::fmt::Debug + 'a,
     {
         // Helper for approximate float comparison
         let assert_approx_eq = |a: T, b: T, message: &str| {
-            let epsilon = T::from(1e-6).unwrap();
+            let epsilon = NumCast::from(1e-6f64).unwrap();
             assert!(
                 (a - b).abs() < epsilon,
                 "{} (left: {:?}, right: {:?})",
@@ -233,15 +233,15 @@ pub mod tests {
         );
 
         // --- Test `fill_with` and `read_sample` ---
-        buffer.fill_with(&T::from(0.42).unwrap());
+        buffer.fill_with(&NumCast::from(0.42f64).unwrap());
         assert_approx_eq(
             buffer.read_sample(0, 0).unwrap(),
-            T::from(0.42).unwrap(),
+            NumCast::from(0.42f64).unwrap(),
             "fill_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(1, 1).unwrap(),
-            T::from(0.42).unwrap(),
+            NumCast::from(0.42f64).unwrap(),
             "fill_with value mismatch",
         );
         // Test OOB read
@@ -250,86 +250,88 @@ pub mod tests {
 
         // --- Test `write_sample` ---
         assert_eq!(
-            buffer.write_sample(0, 0, &T::from(0.1).unwrap()),
+            buffer.write_sample(0, 0, &NumCast::from(0.1f64).unwrap()),
             Some(false)
         );
         assert_approx_eq(
             buffer.read_sample(0, 0).unwrap(),
-            T::from(0.1).unwrap(),
+            NumCast::from(0.1f64).unwrap(),
             "write_sample value mismatch",
         );
         // Test OOB write
         assert_eq!(
-            buffer.write_sample(buffer.channels(), 0, &T::from(0.101).unwrap()),
+            buffer.write_sample(buffer.channels(), 0, &NumCast::from(0.101f64).unwrap()),
             None
         );
         assert_eq!(
-            buffer.write_sample(0, buffer.frames(), &T::from(0.102).unwrap()),
+            buffer.write_sample(0, buffer.frames(), &NumCast::from(0.102f64).unwrap()),
             None
         );
 
         // --- Test `fill_channel_with` ---
         buffer
-            .fill_channel_with(1, &T::from(0.99).unwrap())
+            .fill_channel_with(1, &NumCast::from(0.99f64).unwrap())
             .unwrap();
         assert_approx_eq(
             buffer.read_sample(1, 0).unwrap(),
-            T::from(0.99).unwrap(),
+            NumCast::from(0.99f64).unwrap(),
             "fill_channel_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(1, 1).unwrap(),
-            T::from(0.99).unwrap(),
+            NumCast::from(0.99f64).unwrap(),
             "fill_channel_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(0, 0).unwrap(),
-            T::from(0.1).unwrap(),
+            NumCast::from(0.1f64).unwrap(),
             "Other channel should be unaffected",
         ); // Other channel unaffected
 
         // --- Test `fill_frame_with` ---
-        buffer.fill_frame_with(2, &T::from(0.88).unwrap()).unwrap();
+        buffer
+            .fill_frame_with(2, &NumCast::from(0.88f64).unwrap())
+            .unwrap();
         assert_approx_eq(
             buffer.read_sample(0, 2).unwrap(),
-            T::from(0.88).unwrap(),
+            NumCast::from(0.88f64).unwrap(),
             "fill_frame_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(1, 2).unwrap(),
-            T::from(0.88).unwrap(),
+            NumCast::from(0.88f64).unwrap(),
             "fill_frame_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(1, 1).unwrap(),
-            T::from(0.99).unwrap(),
+            NumCast::from(0.99f64).unwrap(),
             "Other frame should be unaffected",
         ); // Other frame unaffected
 
         // --- Test `fill_frames_with` ---
         buffer
-            .fill_frames_with(0, 2, &T::from(0.77).unwrap())
+            .fill_frames_with(0, 2, &NumCast::from(0.77f64).unwrap())
             .unwrap();
         assert_approx_eq(
             buffer.read_sample(0, 0).unwrap(),
-            T::from(0.77).unwrap(),
+            NumCast::from(0.77f64).unwrap(),
             "fill_frames_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(1, 1).unwrap(),
-            T::from(0.77).unwrap(),
+            NumCast::from(0.77f64).unwrap(),
             "fill_frames_with value mismatch",
         );
         assert_approx_eq(
             buffer.read_sample(0, 2).unwrap(),
-            T::from(0.88).unwrap(),
+            NumCast::from(0.88f64).unwrap(),
             "Unaffected frame should be unaffected",
         ); // Unaffected frame
 
         // Reset for next tests
         for c in 0..buffer.channels() {
             for f in 0..buffer.frames() {
-                buffer.write_sample(c, f, &T::from((c * 10 + f) as f32 / 100.0).unwrap());
+                buffer.write_sample(c, f, &NumCast::from((c * 10 + f) as f64 / 100.0).unwrap());
             }
         }
         // Expected: ch0: [0.00, 0.01, 0.02, 0.03, ...], ch1: [0.10, 0.11, 0.12, 0.13, ...]
@@ -340,7 +342,10 @@ pub mod tests {
         assert_eq!(copied, 2);
         assert_slice_approx_eq(
             &slice_ch,
-            &vec![T::from(0.11).unwrap(), T::from(0.12).unwrap()],
+            &vec![
+                NumCast::from(0.11f64).unwrap(),
+                NumCast::from(0.12f64).unwrap(),
+            ],
             "copy_from_channel_to_slice mismatch",
         );
 
@@ -350,7 +355,10 @@ pub mod tests {
         assert_eq!(copied, 2);
         assert_slice_approx_eq(
             &slice_fr,
-            &vec![T::from(0.02).unwrap(), T::from(0.12).unwrap()],
+            &vec![
+                NumCast::from(0.02f64).unwrap(),
+                NumCast::from(0.12f64).unwrap(),
+            ],
             "copy_from_frame_to_slice mismatch",
         );
 
@@ -360,7 +368,7 @@ pub mod tests {
         // After: (0,0) is 0.0, (1,1) is 0.0
         assert_approx_eq(
             buffer.read_sample(1, 1).unwrap(),
-            T::from(0.0).unwrap(),
+            NumCast::from(0.0f64).unwrap(),
             "copy_sample_within value mismatch",
         );
 
@@ -370,12 +378,12 @@ pub mod tests {
         // After: (0,1) is 0.10, (1,0) is 0.01
         assert_approx_eq(
             buffer.read_sample(0, 1).unwrap(),
-            T::from(0.10).unwrap(),
+            NumCast::from(0.10f64).unwrap(),
             "swap_samples value mismatch on sample A",
         );
         assert_approx_eq(
             buffer.read_sample(1, 0).unwrap(),
-            T::from(0.01).unwrap(),
+            NumCast::from(0.01f64).unwrap(),
             "swap_samples value mismatch on sample B",
         );
     }

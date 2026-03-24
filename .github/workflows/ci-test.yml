@@ -24,6 +24,9 @@ jobs:
       - name: Run cargo test
         run: cargo test
 
+      - name: Run audioadapter no-default-features tests
+        run: cargo test -p audioadapter --no-default-features
+
   lints:
     name: Lints
     runs-on: ubuntu-latest

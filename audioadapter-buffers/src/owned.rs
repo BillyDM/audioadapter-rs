@@ -36,10 +36,10 @@
 //! ```
 //!
 
-use crate::SizeError;
-
 use crate::slicetools::copy_within_slice;
+use crate::SizeError;
 use crate::{check_slice_length, implement_size_getters};
+use alloc::{vec, vec::Vec};
 use audioadapter::{Adapter, AdapterMut};
 
 //
@@ -386,6 +386,9 @@ where
 mod tests {
     use super::*;
     use audioadapter::tests::test_adapter_mut_methods;
+
+    #[cfg(feature = "alloc")]
+    use alloc::vec;
 
     fn insert_data(buffer: &mut dyn AdapterMut<i32>) {
         buffer.write_sample(0, 0, &1);

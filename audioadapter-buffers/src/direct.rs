@@ -39,13 +39,15 @@
 //! ```
 //!
 
-use crate::SizeError;
-
 use crate::slicetools::copy_within_slice;
+use crate::SizeError;
 use crate::{check_slice_length, implement_size_getters};
 use audioadapter::{Adapter, AdapterMut};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
+
+#[cfg(feature = "alloc")]
 macro_rules! check_slice_and_vec_length {
     ($buf:expr, $channels:expr, $frames:expr, sequential) => {
         if $buf.len() < $channels {
@@ -114,14 +116,14 @@ macro_rules! check_slice_and_vec_length {
 
 /// Wrapper for a slice of length `channels`, containing vectors of length `frames`.
 /// Each vector contains the samples for all frames of one channel.
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 pub struct SequentialSliceOfVecs<U> {
     buf: U,
     frames: usize,
     channels: usize,
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> SequentialSliceOfVecs<&'a [Vec<T>]> {
     /// Create a new `SequentialSliceOfVecs` to wrap a slice of vectors.
     /// The slice must contain at least `channels` vectors,
@@ -139,7 +141,7 @@ impl<'a, T> SequentialSliceOfVecs<&'a [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> SequentialSliceOfVecs<&'a mut [Vec<T>]> {
     /// Create a new `SequentialSliceOfVecs` to wrap a mutable slice of vectors.
     /// The slice must contain at least `channels` vectors,
@@ -161,7 +163,7 @@ impl<'a, T> SequentialSliceOfVecs<&'a mut [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for SequentialSliceOfVecs<&'a [Vec<T>]>
 where
     T: Clone,
@@ -186,7 +188,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for SequentialSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone,
@@ -211,7 +213,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> AdapterMut<'a, T> for SequentialSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone,
@@ -300,7 +302,7 @@ where
 /// but here vectors for unused channels may be empty.
 /// Reading from an unused channel returns `T::default()`,
 /// while writing does nothing.
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 pub struct SparseSequentialSliceOfVecs<U> {
     buf: U,
     frames: usize,
@@ -308,7 +310,7 @@ pub struct SparseSequentialSliceOfVecs<U> {
     mask: Vec<bool>,
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> SparseSequentialSliceOfVecs<&'a [Vec<T>]> {
     /// Create a new `SparseSequentialSliceOfVecs` to wrap a slice of vectors.
     /// The slice must contain at least `channels` vectors.
@@ -335,7 +337,7 @@ impl<'a, T> SparseSequentialSliceOfVecs<&'a [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> SparseSequentialSliceOfVecs<&'a mut [Vec<T>]> {
     /// Create a new `SparseSequentialSliceOfVecs` to wrap a mutable slice of vectors.
     /// The slice must contain at least `channels` vectors,
@@ -360,7 +362,7 @@ impl<'a, T> SparseSequentialSliceOfVecs<&'a mut [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for SparseSequentialSliceOfVecs<&'a [Vec<T>]>
 where
     T: Clone + Default,
@@ -388,7 +390,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for SparseSequentialSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone + Default,
@@ -416,7 +418,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> AdapterMut<'a, T> for SparseSequentialSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone + Default,
@@ -509,14 +511,14 @@ where
 
 /// Wrapper for a slice of length `frames`, containing vectors of length `channels`.
 /// Each vector contains the samples for all channels of one frame.
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 pub struct InterleavedSliceOfVecs<U> {
     buf: U,
     frames: usize,
     channels: usize,
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> InterleavedSliceOfVecs<&'a [Vec<T>]> {
     /// Create a new `InterleavedSliceOfVecs` to wrap a slice of vectors.
     /// The slice must contain at least `frames` vectors,
@@ -534,7 +536,7 @@ impl<'a, T> InterleavedSliceOfVecs<&'a [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> InterleavedSliceOfVecs<&'a mut [Vec<T>]> {
     /// Create a new `InterleavedSliceOfVecs` to wrap a mutable slice of vectors.
     /// The slice must contain at least `frames` vectors,
@@ -556,7 +558,7 @@ impl<'a, T> InterleavedSliceOfVecs<&'a mut [Vec<T>]> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for InterleavedSliceOfVecs<&'a [Vec<T>]>
 where
     T: Clone,
@@ -582,7 +584,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> Adapter<'a, T> for InterleavedSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone,
@@ -608,7 +610,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 impl<'a, T> AdapterMut<'a, T> for InterleavedSliceOfVecs<&'a mut [Vec<T>]>
 where
     T: Clone,
@@ -1072,6 +1074,11 @@ where
 mod tests {
     use super::*;
     use audioadapter::tests::test_adapter_mut_methods;
+    extern crate alloc;
+    use alloc::vec;
+
+    #[cfg(feature = "alloc")]
+    use alloc::boxed::Box;
 
     fn insert_data(buffer: &mut dyn AdapterMut<i32>) {
         buffer.write_sample(0, 0, &1).unwrap();
@@ -1146,7 +1153,7 @@ mod tests {
         assert_eq!(buffer.read_sample(1, 2).unwrap(), 6);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn vec_of_channels() {
         let mut data = vec![vec![0_i32; 3], vec![0_i32; 3]];
@@ -1158,7 +1165,7 @@ mod tests {
         test_mut_slice_frame(&mut buffer);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn vec_of_frames() {
         let mut data = vec![vec![1_i32, 4], vec![2_i32, 5], vec![3, 6]];
@@ -1193,7 +1200,7 @@ mod tests {
     }
 
     // This tests that an Adapter is object safe.
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn boxed_buffer() {
         let mut data = [1_i32, 2, 3, 4, 5, 6];
@@ -1210,9 +1217,9 @@ mod tests {
         fn is_sync<T: Sync>() {}
         is_send::<InterleavedSlice<f32>>();
         is_sync::<InterleavedSlice<f32>>();
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         is_send::<InterleavedSliceOfVecs<f32>>();
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         is_sync::<InterleavedSliceOfVecs<f32>>();
     }
 
@@ -1263,7 +1270,7 @@ mod tests {
         assert_eq!(data, expected);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn sparse_sequential() {
         use audioadapter::stats::AdapterStats;
@@ -1306,7 +1313,7 @@ mod tests {
         check_copy_within(&mut adapter);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn copy_within_interleaved_vecs() {
         let mut data = vec![vec![0; 2]; 10];
@@ -1314,7 +1321,7 @@ mod tests {
         check_copy_within(&mut adapter);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn copy_within_sequential_vecs() {
         let mut data = vec![vec![0; 10]; 2];
@@ -1336,7 +1343,7 @@ mod tests {
         test_adapter_mut_methods(&mut buffer);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_interleaved_slice_of_vecs_with_generic_tester() {
         let mut data = vec![vec![0usize; 2]; 4];
@@ -1344,7 +1351,7 @@ mod tests {
         test_adapter_mut_methods(&mut buffer);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_sequential_slice_of_vecs_with_generic_tester() {
         let mut data = vec![vec![0usize; 4]; 2];
@@ -1352,7 +1359,7 @@ mod tests {
         test_adapter_mut_methods(&mut buffer);
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_sparse_sequential_slice_of_vecs_with_generic_tester() {
         let mut data = vec![vec![0usize; 4], vec![0usize; 4]];

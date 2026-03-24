@@ -90,8 +90,7 @@ This is handled by selecting `I24_4RJ_LE` or `I24_4LJ_LE` as the format.
 
 ## Use without the standard library
 This crate can be used in `no_std` environments if the `std` Cargo feature is disabled.
-This feature is enabled by default.
-Disabling it also disables all functionality that depends on the standard library,
-such as the buffers in the [owned] module since they are based on [std::vec::Vec].
+The `libm` feature must be enabled when the `std` feature is disabled.
+You can also enable the `alloc` feature to get the buffer types in the [owned] module.
 
 ## License: MIT

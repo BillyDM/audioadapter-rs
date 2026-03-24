@@ -16,16 +16,16 @@ jobs:
           components: rustfmt, clippy
 
       - name: Run cargo check
-        run: cargo check
+        run: cargo check --workspace
 
       - name: Run cargo check no features
-        run: cargo check --no-default-features
+        run: cargo check --workspace --no-default-features --features "audioadapter/libm, audioadapter-sample/libm, audioadapter-buffers/libm"
 
       - name: Run cargo test
-        run: cargo test
+        run: cargo test --workspace
 
-      - name: Run audioadapter no-default-features tests
-        run: cargo test -p audioadapter --no-default-features --features "libm"
+      - name: Run cargo no-default-features tests
+        run: cargo test --workspace --no-default-features --features "audioadapter/libm, audioadapter-sample/libm, audioadapter-buffers/libm"
 
   lints:
     name: Lints

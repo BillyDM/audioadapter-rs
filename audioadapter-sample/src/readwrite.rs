@@ -523,6 +523,8 @@ impl<W: io::Write + ?Sized> WriteSamples for W {}
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
+
     use super::*;
     use crate::readwrite::ReadSamples;
     use crate::readwrite::WriteSamples;

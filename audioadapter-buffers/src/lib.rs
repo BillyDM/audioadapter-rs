@@ -1,5 +1,8 @@
 #![doc = include_str!("../README.md")]
-#![cfg_attr(all(not(feature = "std"), not(test)), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 /// Wrappers providing direct access to samples in buffers.
 pub mod direct;
@@ -7,7 +10,7 @@ pub mod direct;
 /// stored both directly and as raw bytes.
 pub mod number_to_float;
 /// Wrappers that store their data in an owned vector.
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 pub mod owned;
 
 /// Dummy Adapter
@@ -15,10 +18,9 @@ pub mod dummy;
 
 mod slicetools;
 
-#[cfg(feature = "std")]
-use std::error::Error;
-#[cfg(feature = "std")]
-use std::fmt;
+use core::error::Error;
+use core::fmt;
+use core::write;
 
 pub mod adapter_to_float;
 
@@ -46,18 +48,17 @@ pub enum SizeError {
     },
 }
 
-#[cfg(feature = "std")]
 impl Error for SizeError {}
 
-#[cfg(feature = "std")]
 impl fmt::Display for SizeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let desc = match self {
+        match self {
             SizeError::Channel {
                 index,
                 actual,
                 required,
-            } => format!(
+            } => write!(
+                f,
                 "Buffer for channel {} is too short, got: {}, required: {}",
                 index, actual, required
             ),
@@ -65,20 +66,22 @@ impl fmt::Display for SizeError {
                 index,
                 actual,
                 required,
-            } => format!(
+            } => write!(
+                f,
                 "Buffer for frame {} is too short, got: {}, required: {}",
                 index, actual, required
             ),
-            SizeError::Total { actual, required } => format!(
+            SizeError::Total { actual, required } => write!(
+                f,
                 "Buffer is too short, got: {}, required: {}",
                 actual, required
             ),
-            SizeError::Mask { actual, required } => format!(
+            SizeError::Mask { actual, required } => write!(
+                f,
                 "Mask is wrong length, got: {}, required: {}",
                 actual, required
             ),
-        };
-        write!(f, "{}", &desc)
+        }
     }
 }
 

@@ -19,8 +19,8 @@ libm = ["num-traits/libm"]
 test-utils = []
 
 [dependencies]
-num-traits = { version = "0.2.15", default-features = false }
-audio-core = { version = "0.2.0", default-features = false, optional = true }
+num-traits.workspace = true
+audio-core = { workspace = true, optional = true }
 
 [dev-dependencies]
 audio = "0.2.0"

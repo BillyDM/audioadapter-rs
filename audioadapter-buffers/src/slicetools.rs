@@ -39,6 +39,8 @@ pub unsafe fn copy_within_slice<T: Clone>(slice: &mut [T], src: usize, dest: usi
 #[cfg(test)]
 mod tests {
     use super::*;
+    extern crate alloc;
+    use alloc::{vec, vec::Vec};
 
     #[test]
     fn copy_forward_no_overlap() {

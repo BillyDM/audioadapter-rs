@@ -170,9 +170,12 @@ This is controlled by the `audio` feature which is enabled by default.
 
 ## Cargo features
 This crate has the following features:
- - `std` enables the standard library.
- - `audio` enables `audio` crate compatibility.
+ - `std` - enables the standard library (Enabled by default)
+ - `libm` - this must be enabled if `std` is disabled
+ - `audio` - enables `audio` crate compatibility (Enabled by default)
 
-Both features are enabled by default.
+## Use without the standard library
+This crate can be used in `no_std` environments if the `std` Cargo feature is disabled.
+The `libm` feature must be enabled when the `std` feature is disabled.
 
 ## License: MIT

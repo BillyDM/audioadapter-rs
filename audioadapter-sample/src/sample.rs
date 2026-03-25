@@ -144,7 +144,10 @@ pub struct F64_LE([u8; 8]);
 pub struct F64_BE([u8; 8]);
 
 /// Convert a float to an integer, clamp at the min and max limits of the integer.
-fn to_clamped_int<T: FloatCore + ToPrimitive, U: PrimInt>(value: T, converted: Option<U>) -> ConversionResult<U> {
+fn to_clamped_int<T: FloatCore + ToPrimitive, U: PrimInt>(
+    value: T,
+    converted: Option<U>,
+) -> ConversionResult<U> {
     if let Some(val) = converted {
         return ConversionResult {
             clipped: false,

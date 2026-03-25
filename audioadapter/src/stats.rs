@@ -192,7 +192,10 @@ mod tests {
             let expected = value.sqrt();
             let actual = super::sqrt_newton(value);
             let rel_err = (actual - expected).abs() / expected.max(1.0);
-            assert!(rel_err < 1.0e-12, "value={value}, expected={expected}, actual={actual}, rel_err={rel_err}");
+            assert!(
+                rel_err < 1.0e-12,
+                "value={value}, expected={expected}, actual={actual}, rel_err={rel_err}"
+            );
         }
     }
 }

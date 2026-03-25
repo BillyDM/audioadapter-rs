@@ -19,9 +19,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Publish audioadapter crate
-        # Adding a default "std" feature to this crate would be a breaking change,
-        # so instead just enable the libm feature when performing the compile test.
-        run: cargo publish -p audioadapter --features "libm" --token ${CARGO_REGISTRY_TOKEN}
+        run: cargo publish -p audioadapter --token ${CARGO_REGISTRY_TOKEN}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 

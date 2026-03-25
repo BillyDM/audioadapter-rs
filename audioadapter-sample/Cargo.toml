@@ -14,7 +14,6 @@ readme = "README.md"
 [features]
 default = ["std", "audio"]
 std = ["num-traits/std", "audio-core?/std"]
-libm = ["num-traits/libm"]
 audio = ["dep:audio-core"]
 
 [dependencies]

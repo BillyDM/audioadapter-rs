@@ -61,7 +61,7 @@
 //! }
 use core::mem::size_of;
 
-use num_traits::Float;
+use num_traits::{float::FloatCore, ToPrimitive};
 
 use crate::slicetools::copy_within_slice;
 use crate::SizeError;
@@ -333,7 +333,7 @@ macro_rules! impl_traits_newtype {
     ($structname:ident) => {
         impl<'a, T, U> Adapter<'a, T> for $structname<&'a [U], T>
         where
-            T: Float + 'a,
+            T: FloatCore + ToPrimitive + 'a,
             U: RawSample,
         {
             unsafe fn read_sample_unchecked(&self, channel: usize, frame: usize) -> T {
@@ -346,7 +346,7 @@ macro_rules! impl_traits_newtype {
 
         impl<'a, T, U> Adapter<'a, T> for $structname<&'a mut [U], T>
         where
-            T: Float + 'a,
+            T: FloatCore + ToPrimitive + 'a,
             U: RawSample,
         {
             unsafe fn read_sample_unchecked(&self, channel: usize, frame: usize) -> T {
@@ -359,7 +359,7 @@ macro_rules! impl_traits_newtype {
 
         impl<'a, T, U> AdapterMut<'a, T> for $structname<&'a mut [U], T>
         where
-            T: Float + 'a,
+            T: FloatCore + ToPrimitive + 'a,
             U: RawSample + Clone,
         {
             unsafe fn write_sample_unchecked(

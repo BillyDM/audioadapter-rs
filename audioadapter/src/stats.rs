@@ -1,11 +1,19 @@
 use num_traits::{Num, ToPrimitive};
 
-// Rust analyzer itself always has the standard library enabled,
-// which causes it to think this trait is not used.
-#[allow(unused)]
-use num_traits::Float;
-
 use crate::Adapter;
+
+pub fn sqrt_newton(value: f64) -> f64 {
+    if value <= 0.0 {
+        return 0.0;
+    }
+
+    let mut estimate = f64::from_bits((value.to_bits() + (1023_u64 << 52)) >> 1);
+    for _ in 0..5 {
+        estimate = 0.5 * (estimate + value / estimate);
+    }
+
+    estimate
+}
 
 /// A trait providing methods to calculate the RMS and peak-to-peak values of a channel or frame.
 /// This requires that the samples are of a numerical type, that implement the
@@ -30,7 +38,7 @@ where
                 .unwrap_or_default();
             square_sum += sample * sample;
         }
-        (square_sum / self.frames() as f64).sqrt()
+        sqrt_newton(square_sum / self.frames() as f64)
     }
 
     /// Calculate the RMS value of the given channel.
@@ -48,7 +56,7 @@ where
                 .unwrap_or_default();
             square_sum += sample * sample;
         }
-        (square_sum / self.channels() as f64).sqrt()
+        sqrt_newton(square_sum / self.channels() as f64)
     }
 
     /// Calculate the peak-to-peak value of the given channel.
@@ -161,5 +169,30 @@ mod tests {
         assert_eq!(buffer.frame_rms(0), 1.0);
         assert_eq!(buffer.frame_min_and_max(0), (-1.0, 1.0));
         assert_eq!(buffer.frame_peak_to_peak(0), 2.0);
+    }
+
+    #[test]
+    fn sqrt_newton_accuracy() {
+        let test_values: [f64; 12] = [
+            1.0e-12_f64,
+            1.0e-9_f64,
+            1.0e-6_f64,
+            1.0e-3_f64,
+            0.1_f64,
+            0.5_f64,
+            1.0_f64,
+            2.0_f64,
+            10.0_f64,
+            100.0_f64,
+            1.0e6_f64,
+            1.0e12_f64,
+        ];
+
+        for value in test_values {
+            let expected = value.sqrt();
+            let actual = super::sqrt_newton(value);
+            let rel_err = (actual - expected).abs() / expected.max(1.0);
+            assert!(rel_err < 1.0e-12, "value={value}, expected={expected}, actual={actual}, rel_err={rel_err}");
+        }
     }
 }

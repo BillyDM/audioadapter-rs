@@ -140,7 +140,6 @@ for a vector of strings.
 
 ## Using without the standard library
 The `audioadapter` traits do not require the standard library,
-and can therefore be used in `no_std` environments. However, the `libm` feature
-must be enabled when the `std` feature is disabled.
+and can therefore be used in `no_std` environments.
 
 ## License: MIT

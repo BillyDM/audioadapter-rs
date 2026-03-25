@@ -14,7 +14,6 @@ readme = "README.md"
 [features]
 default = ["audio"]
 audio = ["audio-core"]
-libm = ["num-traits/libm"]
 
 test-utils = []
 
@@ -24,3 +23,9 @@ audio-core = { workspace = true, optional = true }
 
 [dev-dependencies]
 audio = "0.2.0"
+criterion = "0.6"
+num-traits = { workspace = true, features = ["std"] }
+
+[[bench]]
+name = "sqrt"
+harness = false

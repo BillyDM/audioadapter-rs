@@ -18,14 +18,14 @@ jobs:
       - name: Run cargo check
         run: cargo check --workspace
 
-      - name: Run cargo check no features
-        run: cargo check --workspace --no-default-features --features "audioadapter/libm, audioadapter-sample/libm, audioadapter-buffers/libm"
-
       - name: Run cargo test
         run: cargo test --workspace
 
-      - name: Run cargo no-default-features tests
-        run: cargo test --workspace --no-default-features --features "audioadapter/libm, audioadapter-sample/libm, audioadapter-buffers/libm"
+      - name: Run cargo check no features
+        run: cargo check --workspace --no-default-features
+
+      - name: Run cargo test no features
+        run: cargo test --workspace --no-default-features
 
   lints:
     name: Lints

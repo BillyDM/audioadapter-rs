@@ -1,5 +1,5 @@
 use crate::sample::*;
-use num_traits::Float;
+use num_traits::{float::FloatCore, Float, ToPrimitive};
 use std::io;
 
 /// A trait that extends [std::io::Read] with methods for reading samples directly.
@@ -77,7 +77,9 @@ pub trait ReadSamples: io::Read {
     ///
     /// * The underlying reader returns an error.
     /// * The number of bytes read is not sufficient to represent a complete sample.
-    fn read_converted<T: RawSample + BytesSample, U: Float>(&mut self) -> io::Result<U> {
+    fn read_converted<T: RawSample + BytesSample, U: Float + FloatCore + ToPrimitive>(
+        &mut self,
+    ) -> io::Result<U> {
         let sample = self.read_sample::<T>()?;
         Ok(sample.to_scaled_float::<U>())
     }
@@ -169,7 +171,7 @@ pub trait ReadSamples: io::Read {
     /// * The underlying reader returns an error.
     /// * The number of bytes read is not sufficient to represent a complete sample.
     /// * The end of the reader is reached before all samples have been read.
-    fn read_converted_exact<T: RawSample + BytesSample, U: Float>(
+    fn read_converted_exact<T: RawSample + BytesSample, U: Float + FloatCore + ToPrimitive>(
         &mut self,
         buf: &mut [U],
     ) -> io::Result<()> {
@@ -314,7 +316,10 @@ pub trait ReadSamples: io::Read {
     /// This function will return an error if:
     ///
     /// * The underlying reader returns an error (except for EOF).
-    fn read_converted_to_limit_or_end<T: RawSample + BytesSample, U: Float>(
+    fn read_converted_to_limit_or_end<
+        T: RawSample + BytesSample,
+        U: Float + FloatCore + ToPrimitive,
+    >(
         &mut self,
         buf: &mut Vec<U>,
         limit: Option<usize>,
@@ -416,7 +421,7 @@ pub trait WriteSamples: io::Write {
     /// This function will return an error if:
     ///
     /// * The underlying writer returns an error.
-    fn write_converted<T: RawSample + BytesSample, U: Float>(
+    fn write_converted<T: RawSample + BytesSample, U: Float + FloatCore + ToPrimitive>(
         &mut self,
         value: U,
     ) -> io::Result<bool> {
@@ -504,7 +509,7 @@ pub trait WriteSamples: io::Write {
     /// This function will return an error if:
     ///
     /// * The underlying writer returns an error.
-    fn write_all_converted<T: RawSample + BytesSample, U: Float>(
+    fn write_all_converted<T: RawSample + BytesSample, U: Float + FloatCore + ToPrimitive>(
         &mut self,
         values: &[U],
     ) -> io::Result<usize> {

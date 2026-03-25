@@ -14,7 +14,6 @@ readme = "README.md"
 [features]
 default = ["std"]
 std = ["audioadapter-sample/std", "num-traits/std", "alloc"]
-libm = ["audioadapter/libm", "audioadapter-sample/libm"]
 alloc = []
 
 [dependencies]

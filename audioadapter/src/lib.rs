@@ -342,7 +342,7 @@ pub mod tests {
         assert_eq!(copied, 2);
         assert_slice_approx_eq(
             &slice_ch,
-            &vec![
+            &[
                 NumCast::from(0.11f64).unwrap(),
                 NumCast::from(0.12f64).unwrap(),
             ],
@@ -355,7 +355,7 @@ pub mod tests {
         assert_eq!(copied, 2);
         assert_slice_approx_eq(
             &slice_fr,
-            &vec![
+            &[
                 NumCast::from(0.02f64).unwrap(),
                 NumCast::from(0.12f64).unwrap(),
             ],

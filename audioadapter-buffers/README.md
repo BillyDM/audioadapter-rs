@@ -92,4 +92,11 @@ This is handled by selecting `I24_4RJ_LE` or `I24_4LJ_LE` as the format.
 This crate can be used in `no_std` environments if the `std` Cargo feature is disabled.
 You can also enable the `alloc` feature to get the buffer types in the [owned] module.
 
-## License: MIT
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+- MIT license ([LICENSE-MIT](LICENSE-MIT))
+
+at your option.

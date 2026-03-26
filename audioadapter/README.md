@@ -156,4 +156,11 @@ for a vector of strings.
 The `audioadapter` traits do not require the standard library,
 and can therefore be used in `no_std` environments.
 
-## License: MIT
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+- MIT license ([LICENSE-MIT](LICENSE-MIT))
+
+at your option.

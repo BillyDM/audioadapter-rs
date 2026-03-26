@@ -47,4 +47,11 @@ reads/writes can go out of bounds and cause undefined behavior.
 In short: the danger is not in the method names themselves, but in providing an
 incorrect implementation of the safe size-reporting methods that the traits rely on.
 
-## License: MIT
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+- MIT license ([LICENSE-MIT](LICENSE-MIT))
+
+at your option.

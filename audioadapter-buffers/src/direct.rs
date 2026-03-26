@@ -514,14 +514,14 @@ pub struct SequentialSliceOfSlices<U> {
     channels: usize,
 }
 
-impl<'a, 'b, T> SequentialSliceOfSlices<&'a [&'b [T]]> {
+impl<'a, T> SequentialSliceOfSlices<&'a [&'a [T]]> {
     /// Create a new `SequentialSliceOfSlices` to wrap a slice of slices.
     /// The slice must contain at least `channels` slices,
     /// and each channel slice must be at least `frames` long.
     /// They are allowed to be longer than needed,
     /// but these extra frames or channels cannot
     /// be accessed via the trait methods.
-    pub fn new(buf: &'a [&'b [T]], channels: usize, frames: usize) -> Result<Self, SizeError> {
+    pub fn new(buf: &'a [&'a [T]], channels: usize, frames: usize) -> Result<Self, SizeError> {
         check_slice_and_vec_length!(buf, channels, frames, sequential);
         Ok(Self {
             buf,
@@ -531,7 +531,7 @@ impl<'a, 'b, T> SequentialSliceOfSlices<&'a [&'b [T]]> {
     }
 }
 
-impl<'a, 'b, T> SequentialSliceOfSlices<&'a mut [&'b mut [T]]> {
+impl<'a, T> SequentialSliceOfSlices<&'a mut [&'a mut [T]]> {
     /// Create a new `SequentialSliceOfSlices` to wrap a mutable slice of slices.
     /// The slice must contain at least `channels` slices,
     /// and each channel slice must be at least `frames` long.
@@ -539,7 +539,7 @@ impl<'a, 'b, T> SequentialSliceOfSlices<&'a mut [&'b mut [T]]> {
     /// but these extra frames or channels cannot
     /// be accessed via the trait methods.
     pub fn new_mut(
-        buf: &'a mut [&'b mut [T]],
+        buf: &'a mut [&'a mut [T]],
         channels: usize,
         frames: usize,
     ) -> Result<Self, SizeError> {
@@ -552,7 +552,7 @@ impl<'a, 'b, T> SequentialSliceOfSlices<&'a mut [&'b mut [T]]> {
     }
 }
 
-unsafe impl<'a, 'b, T> Adapter<'a, T> for SequentialSliceOfSlices<&'a [&'b [T]]>
+unsafe impl<'a, T> Adapter<'a, T> for SequentialSliceOfSlices<&'a [&'a [T]]>
 where
     T: Clone,
 {
@@ -576,7 +576,7 @@ where
     }
 }
 
-unsafe impl<'a, 'b, T> Adapter<'a, T> for SequentialSliceOfSlices<&'a mut [&'b mut [T]]>
+unsafe impl<'a, T> Adapter<'a, T> for SequentialSliceOfSlices<&'a mut [&'a mut [T]]>
 where
     T: Clone,
 {
@@ -600,7 +600,7 @@ where
     }
 }
 
-unsafe impl<'a, 'b, T> AdapterMut<'a, T> for SequentialSliceOfSlices<&'a mut [&'b mut [T]]>
+unsafe impl<'a, T> AdapterMut<'a, T> for SequentialSliceOfSlices<&'a mut [&'a mut [T]]>
 where
     T: Clone,
 {
@@ -695,7 +695,7 @@ pub struct SparseSequentialSliceOfSlices<'a, U: 'a> {
     mask: &'a [bool],
 }
 
-impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a [&'b [T]]> {
+impl<'a, T> SparseSequentialSliceOfSlices<'a, &'a [&'a [T]]> {
     /// Create a new `SparseSequentialSliceOfSlices` to wrap a slice of slices.
     /// The slice must contain at least `channels` slices.
     /// The slices for channels that are marked as active
@@ -705,7 +705,7 @@ impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a [&'b [T]]> {
     /// be accessed via the trait methods.
     /// Slices for unused channels are never accessed and can have any length.
     pub fn new(
-        buf: &'a [&'b [T]],
+        buf: &'a [&'a [T]],
         channels: usize,
         frames: usize,
         active_channels_mask: &'a [bool],
@@ -720,7 +720,7 @@ impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a [&'b [T]]> {
     }
 }
 
-impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a mut [&'b mut [T]]> {
+impl<'a, T> SparseSequentialSliceOfSlices<'a, &'a mut [&'a mut [T]]> {
     /// Create a new `SparseSequentialSliceOfSlices` to wrap a mutable slice of slices.
     /// The slice must contain at least `channels` slices,
     /// and each channel slice must be at least `frames` long.
@@ -728,7 +728,7 @@ impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a mut [&'b mut [T]]> {
     /// but these extra frames or channels cannot
     /// be accessed via the trait methods.
     pub fn new_mut(
-        buf: &'a mut [&'b mut [T]],
+        buf: &'a mut [&'a mut [T]],
         channels: usize,
         frames: usize,
         active_channels_mask: &'a [bool],
@@ -743,7 +743,7 @@ impl<'a, 'b, T> SparseSequentialSliceOfSlices<'a, &'a mut [&'b mut [T]]> {
     }
 }
 
-unsafe impl<'a, 'b, T> Adapter<'a, T> for SparseSequentialSliceOfSlices<'a, &'a [&'b [T]]>
+unsafe impl<'a, T> Adapter<'a, T> for SparseSequentialSliceOfSlices<'a, &'a [&'a [T]]>
 where
     T: Clone + Default,
 {
@@ -770,7 +770,7 @@ where
     }
 }
 
-unsafe impl<'a, 'b, T> Adapter<'a, T> for SparseSequentialSliceOfSlices<'a, &'a mut [&'b mut [T]]>
+unsafe impl<'a, T> Adapter<'a, T> for SparseSequentialSliceOfSlices<'a, &'a mut [&'a mut [T]]>
 where
     T: Clone + Default,
 {
@@ -797,8 +797,7 @@ where
     }
 }
 
-unsafe impl<'a, 'b, T> AdapterMut<'a, T>
-    for SparseSequentialSliceOfSlices<'a, &'a mut [&'b mut [T]]>
+unsafe impl<'a, T> AdapterMut<'a, T> for SparseSequentialSliceOfSlices<'a, &'a mut [&'a mut [T]]>
 where
     T: Clone + Default,
 {

@@ -101,7 +101,7 @@ macro_rules! byte_convert_traits_newtype {
                 }
             }
 
-            impl<'a, T> Adapter<'a, T> for ConvertBytes<T, $typename, &'a dyn Adapter<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
+            unsafe impl<'a, T> Adapter<'a, T> for ConvertBytes<T, $typename, &'a dyn Adapter<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
             where
             T: FloatCore + ToPrimitive + 'a,
             {
@@ -114,7 +114,7 @@ macro_rules! byte_convert_traits_newtype {
                 implement_wrapped_size_getters!();
             }
 
-            impl<'a, T> Adapter<'a, T> for ConvertBytes<T, $typename, &'a mut dyn AdapterMut<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
+            unsafe impl<'a, T> Adapter<'a, T> for ConvertBytes<T, $typename, &'a mut dyn AdapterMut<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
             where
             T: FloatCore + ToPrimitive + 'a,
             {
@@ -127,7 +127,7 @@ macro_rules! byte_convert_traits_newtype {
                 implement_wrapped_size_getters!();
             }
 
-            impl<'a, T> AdapterMut<'a, T> for ConvertBytes<T, $typename, &'a mut dyn AdapterMut<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
+            unsafe impl<'a, T> AdapterMut<'a, T> for ConvertBytes<T, $typename, &'a mut dyn AdapterMut<'a, [u8; $typename::BYTES_PER_SAMPLE]>>
             where
             T: FloatCore + ToPrimitive + 'a,
             {
@@ -228,7 +228,7 @@ where
     }
 }
 
-impl<'a, T, U> Adapter<'a, T> for ConvertNumbers<&'a dyn Adapter<'a, U>, T>
+unsafe impl<'a, T, U> Adapter<'a, T> for ConvertNumbers<&'a dyn Adapter<'a, U>, T>
 where
     T: FloatCore + ToPrimitive + 'a,
     U: RawSample + 'a,
@@ -242,7 +242,7 @@ where
     implement_wrapped_size_getters!();
 }
 
-impl<'a, T, U> Adapter<'a, T> for ConvertNumbers<&'a mut dyn AdapterMut<'a, U>, T>
+unsafe impl<'a, T, U> Adapter<'a, T> for ConvertNumbers<&'a mut dyn AdapterMut<'a, U>, T>
 where
     T: FloatCore + ToPrimitive + 'a,
     U: RawSample + 'a,
@@ -256,7 +256,7 @@ where
     implement_wrapped_size_getters!();
 }
 
-impl<'a, T, U> AdapterMut<'a, T> for ConvertNumbers<&'a mut dyn AdapterMut<'a, U>, T>
+unsafe impl<'a, T, U> AdapterMut<'a, T> for ConvertNumbers<&'a mut dyn AdapterMut<'a, U>, T>
 where
     T: FloatCore + ToPrimitive + 'a,
     U: RawSample + Clone + 'a,

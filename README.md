@@ -32,4 +32,19 @@ and then again to the desired output format.
 
 The audioadapter crates help with both these challenges.
 
+## Safety and `unsafe trait`
+
+The core traits `Adapter` and `AdapterMut` are `unsafe trait`s.
+Here, `unsafe` does not mean that *using* the trait methods is always unsafe,
+but that implementing the traits has a safety contract.
+
+The contract is that methods like `channels()` and `frames()` must always report
+correct, stable bounds for the underlying buffer while the adapter is in use.
+Many safe helper methods rely on these values before calling unchecked access
+internally. If an implementation reports incorrect values, those internal unchecked
+reads/writes can go out of bounds and cause undefined behavior.
+
+In short: the danger is not in the method names themselves, but in providing an
+incorrect implementation of the safe size-reporting methods that the traits rely on.
+
 ## License: MIT

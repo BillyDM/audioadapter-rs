@@ -46,7 +46,7 @@ pub mod tests {
         }
     }
 
-    impl<'a, T> Adapter<'a, T> for MinimalAdapter<T>
+    unsafe impl<'a, T> Adapter<'a, T> for MinimalAdapter<T>
     where
         T: Clone + 'a,
     {
@@ -64,7 +64,7 @@ pub mod tests {
         }
     }
 
-    impl<'a, T> AdapterMut<'a, T> for MinimalAdapter<T>
+    unsafe impl<'a, T> AdapterMut<'a, T> for MinimalAdapter<T>
     where
         T: Clone + 'a,
     {

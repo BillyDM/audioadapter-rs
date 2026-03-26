@@ -331,7 +331,7 @@ where
 
 macro_rules! impl_traits_newtype {
     ($structname:ident) => {
-        impl<'a, T, U> Adapter<'a, T> for $structname<&'a [U], T>
+        unsafe impl<'a, T, U> Adapter<'a, T> for $structname<&'a [U], T>
         where
             T: FloatCore + ToPrimitive + 'a,
             U: RawSample,
@@ -344,7 +344,7 @@ macro_rules! impl_traits_newtype {
             implement_size_getters!();
         }
 
-        impl<'a, T, U> Adapter<'a, T> for $structname<&'a mut [U], T>
+        unsafe impl<'a, T, U> Adapter<'a, T> for $structname<&'a mut [U], T>
         where
             T: FloatCore + ToPrimitive + 'a,
             U: RawSample,
@@ -357,7 +357,7 @@ macro_rules! impl_traits_newtype {
             implement_size_getters!();
         }
 
-        impl<'a, T, U> AdapterMut<'a, T> for $structname<&'a mut [U], T>
+        unsafe impl<'a, T, U> AdapterMut<'a, T> for $structname<&'a mut [U], T>
         where
             T: FloatCore + ToPrimitive + 'a,
             U: RawSample + Clone,

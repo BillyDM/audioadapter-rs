@@ -88,6 +88,17 @@ indirectly.
 This makes it possible to do implementations where the samples are converted
 from one format to another when reading and writing from/to the underlying data.
 
+## Safety and `unsafe trait`
+
+The core traits [Adapter] and [AdapterMut] are `unsafe trait`s.
+This means that implementing the traits comes with a safety contract.
+
+Implementations must report correct, stable bounds via `channels()` and `frames()`
+while an adapter is in use.
+Safe helper methods rely on these values before calling unchecked access internally.
+If these methods report incorrect bounds, the internal unchecked reads/writes may go
+out of bounds and cause undefined behavior.
+
 The crate also provides wrappers that implement the traits some or all of these traits
 for a number of common data structures used for storing audio data.
 
@@ -127,6 +138,9 @@ The required trait methods are simple, in order to make is easy
 to implement them for new data structures.
 The tests of this crate includes a minimal implementation called `MinimalAdapter`,
 that is based on a normal vector. 
+
+Since [Adapter] and [AdapterMut] are unsafe traits, new implementations must be
+declared with `unsafe impl` and uphold the bounds-reporting contract above.
 
 The [Adapter] and [AdapterMut] traits provide default implementations
 for the functions that read and write slices.

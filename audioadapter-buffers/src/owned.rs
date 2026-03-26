@@ -97,7 +97,7 @@ where
     }
 }
 
-impl<'a, T> Adapter<'a, T> for InterleavedOwned<T>
+unsafe impl<'a, T> Adapter<'a, T> for InterleavedOwned<T>
 where
     T: Clone + 'a,
 {
@@ -124,7 +124,7 @@ where
     }
 }
 
-impl<'a, T> AdapterMut<'a, T> for InterleavedOwned<T>
+unsafe impl<'a, T> AdapterMut<'a, T> for InterleavedOwned<T>
 where
     T: Clone + 'a,
 {
@@ -265,7 +265,7 @@ where
     }
 }
 
-impl<'a, T> Adapter<'a, T> for SequentialOwned<T>
+unsafe impl<'a, T> Adapter<'a, T> for SequentialOwned<T>
 where
     T: Clone + 'a,
 {
@@ -292,7 +292,7 @@ where
     }
 }
 
-impl<'a, T> AdapterMut<'a, T> for SequentialOwned<T>
+unsafe impl<'a, T> AdapterMut<'a, T> for SequentialOwned<T>
 where
     T: Clone + 'a,
 {

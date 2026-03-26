@@ -16,13 +16,19 @@ jobs:
           components: rustfmt, clippy
 
       - name: Run cargo check
-        run: cargo check --workspace
+        run: cargo check --workspace --all-targets
 
       - name: Run cargo test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-targets
+
+      - name: Compile benches
+        run: cargo bench --workspace --no-run
 
       - name: Run cargo check no features
         run: cargo check --workspace --no-default-features
+
+      - name: Run cargo check no features all targets
+        run: cargo check --workspace --all-targets --no-default-features
 
       - name: Run cargo test no features
         run: cargo test --workspace --no-default-features
@@ -43,4 +49,4 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run cargo clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings

@@ -29,3 +29,4 @@ audioadapter = { version = "3.0.0", path = "../audioadapter", features = ["test-
 [[bench]]
 name = "iteration"
 harness = false
+required-features = ["alloc"]
